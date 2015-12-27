@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -20,6 +21,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.shadowfacts.activator.misc.ActivatorAction;
 
@@ -303,6 +305,14 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 
 	public void decreaseActivateFrequency(int amount) {
 		activateFrequency = Math.max(activateFrequency - amount, MIN_UPDATE_FREQ);
+	}
+
+	public void dropInventory() {
+		ItemStack stack = getStackInSlot(0);
+		if (stack != null && stack.stackSize > 0) {
+			EntityItem entityItem = new EntityItem(worldObj, xCoord, yCoord, zCoord, stack);
+			worldObj.spawnEntityInWorld(entityItem);
+		}
 	}
 
 //	Block breaking
