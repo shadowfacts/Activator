@@ -15,10 +15,9 @@ public class GuiButtonToggle extends BaseGuiButton {
 
 	public boolean state;
 
-	public GuiButtonToggle(int id, int x, int y, BaseGuiContainer owner, boolean state, String tooltip) {
-		super(id, x, y, 20, 20, null, owner);
+	public GuiButtonToggle(int id, int x, int y, BaseGuiContainer owner, String tooltip, boolean state) {
+		super(id, x, y, 20, 20, null, owner, tooltip);
 		this.state = state;
-		this.tooltip = Collections.singletonList(tooltip);
 	}
 
 	public void onClick() {

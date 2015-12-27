@@ -13,10 +13,9 @@ public class GuiButtonActionType extends BaseGuiButton {
 
 	public ActivatorAction action;
 
-	public GuiButtonActionType(int id, int x, int y, int width, int height, BaseGuiContainer owner, ActivatorAction action) {
-		super(id, x, y, width, height, action.getLocalizedName(), owner);
+	public GuiButtonActionType(int id, int x, int y, int width, int height, BaseGuiContainer owner, String tooltip, ActivatorAction action) {
+		super(id, x, y, width, height, action.getLocalizedName(), owner, tooltip);
 		this.action = action;
-		tooltip = Collections.singletonList(StringHelper.localize("gui.activator.action"));
 	}
 
 	public void onClick() {

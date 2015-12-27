@@ -7,3 +7,5 @@ activator.action.right_sneak=Sneak Right Click
 # GUI
 gui.activator.sneak=Sneak?
 gui.activator.action=Activator Action
+gui.activator.freq.decrease=Decrease Activation Frequency
+gui.activator.freq.increase=Increase Activation Frequency
