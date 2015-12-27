@@ -1,5 +1,6 @@
 package net.shadowfacts.activator.proxy;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -10,6 +11,7 @@ import net.minecraft.world.World;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.achievement.ModAchievements;
+import net.shadowfacts.activator.event.FMLEventHandler;
 import net.shadowfacts.activator.gui.GuiHandler;
 import net.shadowfacts.activator.network.PacketUpdateTE;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
@@ -20,6 +22,8 @@ import net.shadowfacts.activator.tileentity.TileEntityActivator;
 public class CommonProxy {
 
 	public void preInit(FMLPreInitializationEvent event) {
+		FMLCommonHandler.instance().bus().register(new FMLEventHandler());
+
         ActivatorConfig.initialize(event);
 
         Activator.items.initializeItems();

@@ -4,29 +4,30 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
+import net.minecraft.stats.Achievement;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.shadowfacts.activator.Activator;
+import net.shadowfacts.activator.achievement.AchievementProvider;
+import net.shadowfacts.activator.achievement.ModAchievements;
 import net.shadowfacts.activator.gui.GUI;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
 
 /**
  * @author shadowfacts
  */
-public class BlockActivator extends Block implements ITileEntityProvider {
+public class BlockActivator extends Block implements ITileEntityProvider, AchievementProvider {
+
+	BlockActivator(Material material) {
+		super(material);
+	}
 
 	BlockActivator() {
-		super(Material.rock);
+		this(Material.rock);
 		setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator");
 		setBlockTextureName(Activator.modId + ":activator");
@@ -45,7 +46,7 @@ public class BlockActivator extends Block implements ITileEntityProvider {
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		player.openGui(Activator.instance, GUI.ACTIVATOR.ordinal(), world, x, y, z);
+		player.openGui(Activator.instance, GUI.BASIC.ordinal(), world, x, y, z);
 		return true;
 	}
 
@@ -65,5 +66,10 @@ public class BlockActivator extends Block implements ITileEntityProvider {
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
 		return new TileEntityActivator();
+	}
+
+	@Override
+	public Achievement getAchievement() {
+		return ModAchievements.craftActivator;
 	}
 }
