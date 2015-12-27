@@ -14,7 +14,7 @@ public class GuiHandler implements IGuiHandler {
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		switch (GUI.values()[ID]) {
-			case ACTIVATOR:
+			case BASIC:
 				return new ContainerActivator(player.inventory, (TileEntityActivator)world.getTileEntity(x, y, z));
 		}
 		return null;
@@ -23,7 +23,7 @@ public class GuiHandler implements IGuiHandler {
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		switch (GUI.values()[ID]) {
-			case ACTIVATOR:
+			case BASIC:
 				return new GuiActivator(player.inventory, (TileEntityActivator)world.getTileEntity(x, y, z));
 		}
 		return null;

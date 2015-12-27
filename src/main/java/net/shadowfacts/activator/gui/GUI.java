@@ -5,6 +5,9 @@ package net.shadowfacts.activator.gui;
  */
 public enum GUI {
 
-	ACTIVATOR
+	BASIC,
+	REDSTONE,
+	RF,
+	EU;
 
 }
