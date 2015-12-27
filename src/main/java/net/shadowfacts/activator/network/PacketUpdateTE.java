@@ -10,6 +10,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.shadowfacts.activator.Activator;
+import net.shadowfacts.activator.misc.ActivatorAction;
 import net.shadowfacts.activator.tileentity.BaseTileEntity;
 
 /**
@@ -75,19 +77,12 @@ public class PacketUpdateTE implements IMessage {
 		@Override
 		public IMessage onMessage(PacketUpdateTE msg, MessageContext ctx) {
 
-			World world = Minecraft.getMinecraft().theWorld;
+			World world = Activator.proxy.getClientWorld();
 			TileEntity te = world.getTileEntity(msg.x, msg.y, msg.z);
 			if (te instanceof BaseTileEntity) {
 				((BaseTileEntity)te).load(msg.data);
 			}
 
-			return null;
-		}
-	}
-
-	public static class DummyClientHandler implements IMessageHandler<PacketUpdateTE, IMessage> {
-		@Override
-		public IMessage onMessage(PacketUpdateTE message, MessageContext ctx) {
 			return null;
 		}
 	}

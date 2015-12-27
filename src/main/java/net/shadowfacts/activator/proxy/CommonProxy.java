@@ -6,6 +6,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.world.World;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.achievement.ModAchievements;
@@ -48,11 +49,11 @@ public class CommonProxy {
 
 	private void registerPackets() {
 		Activator.network.registerMessage(PacketUpdateTE.ServerHandler.class, PacketUpdateTE.class, 0, Side.SERVER);
-		registerClientPackets();
+		Activator.network.registerMessage(PacketUpdateTE.ClientHandler.class, PacketUpdateTE.class, 0, Side.CLIENT);
 	}
 
-	protected void registerClientPackets() {
-		Activator.network.registerMessage(PacketUpdateTE.DummyClientHandler.class, PacketUpdateTE.class, 0, Side.CLIENT);
+	public World getClientWorld() {
+		return null;
 	}
 
 }
