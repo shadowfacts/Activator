@@ -1,0 +1,9 @@
+# Action types
+activator.action.left=Left Click
+activator.action.left_sneak=Sneak Left Click
+activator.action.right=Right Click
+activator.action.right_sneak=Sneak Right Click
+
+# GUI
+gui.activator.sneak=Sneak?
+gui.activator.action=Activator Action

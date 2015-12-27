@@ -28,6 +28,9 @@ minecraft {
 	version = mc_version + "-" + forge_version
 	runDir = "run"
 
+	replace "@VERSION@", mod_version
+	replaceIn "Activator.java"
+
 	srgExtra "PK: net/shadowfacts/shadowlib net/shadowfacts/shadowmc/shadowlib"
 }
 

@@ -1,0 +1,16 @@
+[
+	{
+		"modid": "activator",
+		"name": "Activator",
+		"description": "Automatic clicker",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"url": "https://github.com/shadowfacts/Activator",
+		"updateUrl": "",
+		"authorList": ["Shadowfacts"],
+		"credits": "",
+		"logoFile": "",
+		"screenshots": [],
+		"dependencies": []
+	}
+]
