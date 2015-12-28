@@ -3,6 +3,8 @@ package net.shadowfacts.activator;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -44,19 +46,16 @@ public class Activator {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		proxy.preInit(event);
-		FMLCommonHandler.instance().bus().register(this);
 	}
 
-	private int tick = 0;
-
-	@SubscribeEvent
-	public void playerTick(TickEvent.PlayerTickEvent event) {
-//		tick++;
-//		if (tick % 20 == 0) {
-//			System.out.println(String.format("Yaw: %f Pitch: %f", event.player.rotationYaw, event.player.rotationPitch));
-//			tick = 0;
-//		}
+	@Mod.EventHandler
+	public void init(FMLInitializationEvent event) {
+		proxy.init(event);
 	}
 
+	@Mod.EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		proxy.postInit(event);
+	}
 
 }
