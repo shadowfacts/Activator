@@ -12,10 +12,12 @@ public class ModBlocks {
 
 	public BlockActivator activator;
 	public BlockRedstoneActivator redstoneActivator;
+	public BlockRFActivator rfActivator;
 
 	public void initializeBlocks() {
 		activator = register(new BlockActivator(), "activator");
 		redstoneActivator = register(new BlockRedstoneActivator(), "activator.redstone");
+		rfActivator = register(new BlockRFActivator(), "activator.rf");
 	}
 
 	private <T extends Block> T register(T block, String name) {

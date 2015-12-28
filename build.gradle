@@ -60,6 +60,10 @@ repositories {
 		name "ChickenBones"
 		url "http://chickenbones.net/maven/"
 	}
+	maven {
+		name "ProfMobius"
+		url "http://mobiusstrip.eu/maven/"
+	}
 }
 
 configurations {
@@ -73,6 +77,8 @@ dependencies {
 	compile group: "codechicken", name: "CodeChickenLib", version: mc_version + "-" + ccl_version, classifier: "dev"
 	compile group: "codechicken", name: "CodeChickenCore", version: mc_version + "-" + ccc_version, classifier: "dev"
 	compile group: "codechicken", name: "NotEnoughItems", version: mc_version + "-" + nei_version, classifier: "dev"
+
+	compile group: "mcp.mobius.waila", name: "Waila", version: waila_version + "_" + mc_version, classifier: "dev"
 }
 
 jar {

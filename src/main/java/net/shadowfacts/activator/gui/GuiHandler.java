@@ -18,7 +18,9 @@ public class GuiHandler implements IGuiHandler {
 			case BASIC:
 				return new ContainerActivator(player.inventory, (TileEntityActivator)world.getTileEntity(x, y, z));
 			case REDSTONE:
-				return new ContainerActivator(player.inventory, (TileEntityRedstoneActivator)world.getTileEntity(x, y, z));
+				return new ContainerActivator(player.inventory, (TileEntityActivator) world.getTileEntity(x, y, z));
+			case RF:
+				return new ContainerActivator(player.inventory, (TileEntityActivator)world.getTileEntity(x, y, z));
 		}
 		return null;
 	}
@@ -30,6 +32,8 @@ public class GuiHandler implements IGuiHandler {
 				return new GuiActivator(player.inventory, (TileEntityActivator)world.getTileEntity(x, y, z));
 			case REDSTONE:
 				return new GuiRedstoneActivator(player.inventory, (TileEntityRedstoneActivator)world.getTileEntity(x, y, z));
+			case RF:
+				return new GuiActivator(player.inventory, (TileEntityActivator)world.getTileEntity(x, y, z));
 		}
 		return null;
 	}

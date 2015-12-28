@@ -11,10 +11,12 @@ import net.minecraft.world.World;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.achievement.ModAchievements;
+import net.shadowfacts.activator.compat.ModCompat;
 import net.shadowfacts.activator.event.FMLEventHandler;
 import net.shadowfacts.activator.gui.GuiHandler;
 import net.shadowfacts.activator.network.PacketUpdateTE;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
+import net.shadowfacts.activator.tileentity.TileEntityRFActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRedstoneActivator;
 
 /**
@@ -38,19 +40,22 @@ public class CommonProxy {
 		registerPackets();
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(Activator.instance, new GuiHandler());
+
+		ModCompat.preInit(event);
 	}
 
 	public void init(FMLInitializationEvent event) {
-
+		ModCompat.init(event);
 	}
 
 	public void postInit(FMLPostInitializationEvent event) {
-
+		ModCompat.postInit(event);
 	}
 
     private void registerTileEntities() {
 		GameRegistry.registerTileEntity(TileEntityActivator.class, "activator");
 		GameRegistry.registerTileEntity(TileEntityRedstoneActivator.class, "activator.redstone");
+		GameRegistry.registerTileEntity(TileEntityRFActivator.class, "activator.rf");
     }
 
 	private void registerPackets() {

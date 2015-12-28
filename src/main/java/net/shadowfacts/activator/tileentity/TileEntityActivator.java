@@ -23,6 +23,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.shadowfacts.activator.misc.ActivatorAction;
+import scala.tools.nsc.backend.icode.Primitives;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 
 
 //	Updating
-	protected boolean activate() {
+	protected Action activate() {
 		FakePlayer player = getPlayer();
 
 		ForgeDirection facing = getFacing();
@@ -107,6 +108,7 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 
 		Block targetBlock = worldObj.getBlock(target.posX, target.posY, target.posZ);
 
+		Action result = Action.NOTHING;
 		boolean done = false;
 
 		player.setSneaking(sneaking);
@@ -117,12 +119,14 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 			if (entity != null && canAttackEntity(entity, stack)) { // attack entity
 				if (stack != null) player.getAttributeMap().applyAttributeModifiers(stack.getAttributeModifiers());
 				player.attackTargetEntityWithCurrentItem(entity);
+				result = Action.ATTACK_ENTITY;
 				done = true;
 			} else if (!isBreaking && canBreakBlock(target.posX, target.posY, target.posZ, targetBlock, stack)) { // break block
 				if (!targetBlock.isAir(worldObj, target.posX, target.posY, target.posZ) &&
 						targetBlock.getBlockHardness(worldObj, target.posX, target.posY, target.posZ) >= 0) {
 					isBreaking = true;
 					startBreaking(targetBlock, worldObj.getBlockMetadata(target.posX, target.posY, target.posZ));
+					result = Action.BREAK_BLOCK;
 					done = true;
 				}
 			}
@@ -149,23 +153,28 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 
 
 			PlayerInteractEvent.Action action = targetBlock.isAir(worldObj, target.posX, target.posY, target.posZ) ? PlayerInteractEvent.Action.RIGHT_CLICK_AIR : PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK;
-			ForgeEventFactory.onPlayerInteract(player, action, target.posX, target.posY, target.posZ, side.ordinal(), worldObj);
+			PlayerInteractEvent event = ForgeEventFactory.onPlayerInteract(player, action, target.posX, target.posY, target.posZ, side.ordinal(), worldObj);
 
-			Entity entity = detectedEntities.isEmpty() ? null : detectedEntities.get(worldObj.rand.nextInt(detectedEntities.size()));
-			done = entity != null && (entity instanceof EntityLiving && stack.getItem().itemInteractionForEntity(stack, player, (EntityLivingBase) entity) || (!(entity instanceof EntityAnimal) || ((EntityAnimal) entity).interact(player)));
 
-			if (!done && stack != null) {
-				stack.getItem().onItemUseFirst(stack, player, worldObj, target.posX, target.posY, target.posZ, side.ordinal(), 0, 0, 0);
-			}
-			if (!done) {
-				done = targetBlock.onBlockActivated(worldObj, target.posX, target.posY, target.posZ, player, side.ordinal(), 0, 0, 0);
-			}
-			if (!done && stack != null) {
-				done = stack.getItem().onItemUse(stack, player, worldObj, target.posX, target.posY, target.posZ, side.ordinal(), 0, 0, 0);
-			}
-			if (!done && stack != null) {
-				stack = stack.getItem().onItemRightClick(stack, worldObj, player);
-				done = true;
+			if (!event.isCanceled()) {
+				result = Action.RIGHT_CLICK;
+
+				Entity entity = detectedEntities.isEmpty() ? null : detectedEntities.get(worldObj.rand.nextInt(detectedEntities.size()));
+				done = entity != null && (entity instanceof EntityLiving && stack.getItem().itemInteractionForEntity(stack, player, (EntityLivingBase) entity) || (!(entity instanceof EntityAnimal) || ((EntityAnimal) entity).interact(player)));
+
+				if (!done && stack != null) {
+					stack.getItem().onItemUseFirst(stack, player, worldObj, target.posX, target.posY, target.posZ, side.ordinal(), 0, 0, 0);
+				}
+				if (!done) {
+					done = targetBlock.onBlockActivated(worldObj, target.posX, target.posY, target.posZ, player, side.ordinal(), 0, 0, 0);
+				}
+				if (!done && stack != null) {
+					done = stack.getItem().onItemUse(stack, player, worldObj, target.posX, target.posY, target.posZ, side.ordinal(), 0, 0, 0);
+				}
+				if (!done && stack != null) {
+					stack = stack.getItem().onItemRightClick(stack, worldObj, player);
+					done = true;
+				}
 			}
 		}
 
@@ -181,7 +190,7 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 
 		markDirty();
 
-		return done;
+		return result;
 	}
 
 	/**
@@ -219,7 +228,11 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 		return true;
 	}
 
-	protected void postActivate(boolean success) {
+	/**
+	 * Called immediately after the activator activates
+	 * @param action The action that was performed
+	 */
+	protected void postActivate(Action action) {
 
 	}
 
@@ -236,6 +249,7 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 				if (ticks % activateFrequency == 0) {
 					ticks = 0;
 					postActivate(activate());
+					sync();
 				}
 				ticks++;
 			}
@@ -278,8 +292,8 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 	}
 
 	//	Utilities
-	private ForgeDirection getFacing() {
-		return ForgeDirection.getOrientation(worldObj.getBlockMetadata(xCoord, yCoord, zCoord));
+	protected ForgeDirection getFacing() {
+		return ForgeDirection.getOrientation(getBlockMetadata());
 	}
 
 	private FakePlayer getPlayer() {
@@ -547,4 +561,12 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
 		return true;
 	}
+
+	public enum Action {
+		ATTACK_ENTITY,
+		BREAK_BLOCK,
+		RIGHT_CLICK,
+		NOTHING;
+	}
+
 }
