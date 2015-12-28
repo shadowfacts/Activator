@@ -1,13 +1,10 @@
 package net.shadowfacts.activator;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.shadowfacts.activator.block.ModBlocks;
 import net.shadowfacts.activator.item.ModItems;

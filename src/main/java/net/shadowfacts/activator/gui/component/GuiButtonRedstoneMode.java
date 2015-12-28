@@ -6,7 +6,6 @@ import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.gui.BaseGuiContainer;
 import net.shadowfacts.activator.misc.RedstoneMode;
 import net.shadowfacts.shadowmc.util.StringHelper;
-import org.lwjgl.opengl.GL11;
 
 import java.util.Arrays;
 import java.util.List;

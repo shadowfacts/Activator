@@ -11,7 +11,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.achievement.AchievementProvider;

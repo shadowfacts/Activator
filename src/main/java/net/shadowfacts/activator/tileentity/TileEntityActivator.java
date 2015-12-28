@@ -23,7 +23,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.shadowfacts.activator.misc.ActivatorAction;
-import scala.tools.nsc.backend.icode.Primitives;
 
 import java.util.ArrayList;
 import java.util.List;

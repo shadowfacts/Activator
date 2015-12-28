@@ -2,10 +2,8 @@ package net.shadowfacts.activator.gui.component;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.util.ResourceLocation;
 import net.shadowfacts.activator.gui.BaseGuiContainer;
 import net.shadowfacts.shadowmc.util.StringHelper;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.Collections;

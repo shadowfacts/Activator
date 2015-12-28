@@ -5,8 +5,6 @@ import net.minecraft.util.ResourceLocation;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.gui.BaseGuiContainer;
 
-import java.util.Collections;
-
 /**
  * @author shadowfacts
  */

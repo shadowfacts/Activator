@@ -12,8 +12,6 @@ import net.shadowfacts.activator.misc.KeyboardHelper;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
 import org.lwjgl.opengl.GL11;
 
-import java.util.stream.Stream;
-
 /**
  * @author shadowfacts
  */

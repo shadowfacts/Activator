@@ -2,9 +2,6 @@ package net.shadowfacts.activator.gui.component;
 
 import net.shadowfacts.activator.gui.BaseGuiContainer;
 import net.shadowfacts.activator.misc.ActivatorAction;
-import net.shadowfacts.shadowmc.util.StringHelper;
-
-import java.util.Collections;
 
 /**
  * @author shadowfacts

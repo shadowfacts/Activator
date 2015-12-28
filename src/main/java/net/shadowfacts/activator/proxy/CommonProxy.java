@@ -19,8 +19,6 @@ import net.shadowfacts.activator.tileentity.TileEntityActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRFActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRedstoneActivator;
 
-import java.text.AttributedCharacterIterator;
-
 /**
  * @author shadowfacts
  */
