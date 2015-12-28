@@ -13,6 +13,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.shadowfacts.activator.Activator;
+import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.achievement.AchievementProvider;
 import net.shadowfacts.activator.achievement.ModAchievements;
 import net.shadowfacts.activator.gui.GUI;
@@ -29,7 +30,7 @@ public class BlockActivator extends Block implements ITileEntityProvider, Achiev
 
 	BlockActivator() {
 		this(Material.rock);
-		setCreativeTab(CreativeTabs.tabMisc);
+		if (ActivatorConfig.basicEnabled) setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator");
 		setBlockTextureName(Activator.modId + ":activator");
 		setHardness(.5f);

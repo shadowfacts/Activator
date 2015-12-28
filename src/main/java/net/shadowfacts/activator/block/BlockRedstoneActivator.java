@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.shadowfacts.activator.Activator;
+import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.achievement.ModAchievements;
 import net.shadowfacts.activator.gui.GUI;
 import net.shadowfacts.activator.tileentity.TileEntityRedstoneActivator;
@@ -19,7 +20,7 @@ public class BlockRedstoneActivator extends BlockActivator {
 
 	BlockRedstoneActivator() {
 		super(Material.rock);
-		setCreativeTab(CreativeTabs.tabMisc);
+		if (ActivatorConfig.redstoneEnabled) setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator.redstone");
 		setBlockTextureName(Activator.modId + ":activator-redstone");
 		setHardness(.5f);

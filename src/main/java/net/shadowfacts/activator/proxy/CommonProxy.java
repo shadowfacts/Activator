@@ -19,6 +19,8 @@ import net.shadowfacts.activator.tileentity.TileEntityActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRFActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRedstoneActivator;
 
+import java.text.AttributedCharacterIterator;
+
 /**
  * @author shadowfacts
  */
@@ -35,6 +37,8 @@ public class CommonProxy {
         registerTileEntities();
 
         ModAchievements.registerAchievements();
+
+		registerRecipes();
 
 		Activator.network = NetworkRegistry.INSTANCE.newSimpleChannel(Activator.name);
 		registerPackets();
@@ -61,6 +65,14 @@ public class CommonProxy {
 	private void registerPackets() {
 		Activator.network.registerMessage(PacketUpdateTE.ServerHandler.class, PacketUpdateTE.class, 0, Side.SERVER);
 		Activator.network.registerMessage(PacketUpdateTE.ClientHandler.class, PacketUpdateTE.class, 0, Side.CLIENT);
+	}
+
+	private void registerRecipes() {
+//		TODO: Recipes
+		if (ActivatorConfig.basicEnabled) ;
+		if (ActivatorConfig.redstoneEnabled) ;
+		if (ActivatorConfig.rfEnabled) ;
+		if (ActivatorConfig.euEnabled) ;
 	}
 
 	public World getClientWorld() {

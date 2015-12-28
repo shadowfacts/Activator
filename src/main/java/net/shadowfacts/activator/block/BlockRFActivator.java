@@ -7,6 +7,7 @@ import net.minecraft.stats.Achievement;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.shadowfacts.activator.Activator;
+import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.achievement.ModAchievements;
 import net.shadowfacts.activator.gui.GUI;
 import net.shadowfacts.activator.tileentity.TileEntityRFActivator;
@@ -16,9 +17,9 @@ import net.shadowfacts.activator.tileentity.TileEntityRFActivator;
  */
 public class BlockRFActivator extends BlockActivator {
 
-	public BlockRFActivator() {
+	BlockRFActivator() {
 		super(Material.rock);
-		setCreativeTab(CreativeTabs.tabMisc);
+		if (ActivatorConfig.rfEnabled) setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator.rf");
 		setBlockTextureName(Activator.modId + ":activator-rf");
 		setHardness(.5f);
