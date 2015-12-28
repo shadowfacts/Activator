@@ -21,7 +21,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.shadowfacts.activator.misc.ActivatorAction;
 
@@ -115,11 +114,11 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 		if (action == ActivatorAction.LEFT_CLICK) {
 			detectEntities(target);
 			Entity entity = detectedEntities.isEmpty() ? null : detectedEntities.get(worldObj.rand.nextInt(detectedEntities.size()));
-			if (entity != null) { // attack entity
+			if (entity != null && canAttackEntity(entity, stack)) { // attack entity
 				if (stack != null) player.getAttributeMap().applyAttributeModifiers(stack.getAttributeModifiers());
 				player.attackTargetEntityWithCurrentItem(entity);
 				done = true;
-			} else if (!isBreaking) { // break block
+			} else if (!isBreaking && canBreakBlock(target.posX, target.posY, target.posZ, targetBlock, stack)) { // break block
 				if (!targetBlock.isAir(worldObj, target.posX, target.posY, target.posZ) &&
 						targetBlock.getBlockHardness(worldObj, target.posX, target.posY, target.posZ) >= 0) {
 					isBreaking = true;
@@ -127,7 +126,7 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 					done = true;
 				}
 			}
-		} else if (action == ActivatorAction.RIGHT_CLICK) {
+		} else if (action == ActivatorAction.RIGHT_CLICK && canRightClick(stack)) {
 
 			ForgeDirection side = facing.getOpposite();
 
@@ -183,6 +182,41 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 		markDirty();
 
 		return done;
+	}
+
+	/**
+	 * Called to check if the activator can attack the entity.
+	 * Used to check any non-normal stuff, e.g. energy or redstone state
+	 * @param entity The entity to attack
+	 * @param stack The stack being attacked with
+	 * @return If the entity can be attacked
+	 */
+	protected boolean canAttackEntity(Entity entity, ItemStack stack) {
+		return true;
+	}
+
+	/**
+	 * Called to check if the activator can break the block
+	 * Used to check any non-normal stuff, e.g. energy or redstone state
+	 * @param x The X coordinate of the block
+	 * @param y The Y coordinate of the block
+	 * @param z The Z coordinate of the block
+	 * @param block The block to be broken
+	 * @param stack The stack being used as a tool
+	 * @return If the block can be broken
+	 */
+	protected boolean canBreakBlock(int x, int y, int z, Block block, ItemStack stack) {
+		return true;
+	}
+
+	/**
+	 * Called to check if the activator can right-click
+	 * Used to check any non-normal stuff, e.g. energy or redstone state
+	 * @param stack The stack to right-click with
+	 * @return If the stack can be right-clicked
+	 */
+	protected boolean canRightClick(ItemStack stack) {
+		return true;
 	}
 
 	protected void postActivate(boolean success) {

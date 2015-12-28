@@ -3,16 +3,21 @@ package net.shadowfacts.activator.misc;
 import net.shadowfacts.shadowmc.util.StringHelper;
 
 /**
+ * Redstone activation modes
+ *
  * @author shadowfacts
  */
-public enum ActivatorAction {
+public enum RedstoneMode {
 
-	LEFT_CLICK("activator.action.left"),
-	RIGHT_CLICK("activator.action.right");
+	ALWAYS("redstone.always"),
+	NEVER("redstone.never"),
+	HIGH("redstone.high"),
+	LOW("redstone.low"),
+	PULSE("redstone.pulse");
 
 	private String unlocalizedName;
 
-	ActivatorAction(String unlocalizedName) {
+	RedstoneMode(String unlocalizedName) {
 		this.unlocalizedName = unlocalizedName;
 	}
 
@@ -20,7 +25,7 @@ public enum ActivatorAction {
 		return StringHelper.localize(unlocalizedName);
 	}
 
-	public static ActivatorAction get(int i) {
+	public static RedstoneMode get(int i) {
 		return values()[i];
 	}
 

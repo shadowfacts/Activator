@@ -1,13 +1,16 @@
 package net.shadowfacts.activator.gui;
 
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
+import net.shadowfacts.activator.gui.component.BaseGuiButton;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author shadowfacts
@@ -95,6 +98,18 @@ public abstract class BaseGuiContainer extends GuiContainer {
 
 	public void drawTooltip(List<String> text, int x, int y) {
 		drawTooltip(text, x, y, 0xffffff);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void drawScreen(int mouseX, int mouseY, float partialTick) {
+		super.drawScreen(mouseX, mouseY, partialTick);
+
+		((Stream<GuiButton>)buttonList.stream())
+				.filter(button -> button instanceof BaseGuiButton)
+				.map(button -> (BaseGuiButton)button)
+				.filter(button -> button.isHovered(mouseX, mouseY))
+				.forEach(button -> button.drawTooltip(mouseX, mouseY));
 	}
 
 }

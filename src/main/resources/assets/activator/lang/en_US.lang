@@ -1,14 +1,29 @@
+# Blocks
+tile.activator.name=Basic Activator
+tile.activator.redstone.name=Redstone Activator
+tile.activator.rf.name=RF Activator
+tile.activator.eu.name=EU Activator
+
 # Action types
 activator.action.left=Left Click
 activator.action.left_sneak=Sneak Left Click
 activator.action.right=Right Click
 activator.action.right_sneak=Sneak Right Click
 
+# Redstone modes
+redstone.always=Always
+redstone.never=Never
+redstone.high=High Signal
+redstone.low=Low Signal
+redstone.pulse=Pulse
+
 # GUI
 gui.activator.sneak=Sneak?
 gui.activator.action=Activator Action
 gui.activator.freq.decrease=Decrease Activation Frequency
 gui.activator.freq.increase=Increase Activation Frequency
+gui.activator.redstone=Change Redstone Mode
+gui.activator.redstone2=Current:
 
 # Achievements
 achievement.craftActivator=Craft a Basic Activator

@@ -19,8 +19,7 @@ public class GuiButtonActionType extends BaseGuiButton {
 	}
 
 	public void onClick() {
-		ActivatorAction nextAction = getNextAction();
-		updateAction(nextAction);
+		updateAction(getNextAction());
 	}
 
 	private void updateAction(ActivatorAction action) {

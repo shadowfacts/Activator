@@ -2,6 +2,7 @@ package net.shadowfacts.activator.gui.component;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
+import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.gui.BaseGuiContainer;
 
 import java.util.Collections;
@@ -11,7 +12,7 @@ import java.util.Collections;
  */
 public class GuiButtonToggle extends BaseGuiButton {
 
-	private static final ResourceLocation texture = new ResourceLocation("activator" ,"textures/gui/toggle.png");
+	private static final ResourceLocation texture = new ResourceLocation(Activator.modId ,"textures/gui/toggle.png");
 
 	public boolean state;
 
@@ -25,7 +26,8 @@ public class GuiButtonToggle extends BaseGuiButton {
 	}
 
 	@Override
-	protected void draw(Minecraft mc, int mouseX, int mouseY) {
+	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+		super.drawButton(mc, mouseX, mouseY);
 		mc.getTextureManager().bindTexture(texture);
 		if (state) { // on
 			drawTexturedModalRect(xPosition, yPosition, 0, 0, width, height);

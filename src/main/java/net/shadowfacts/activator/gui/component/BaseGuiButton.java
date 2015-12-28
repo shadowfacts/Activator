@@ -2,6 +2,7 @@ package net.shadowfacts.activator.gui.component;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.util.ResourceLocation;
 import net.shadowfacts.activator.gui.BaseGuiContainer;
 import net.shadowfacts.shadowmc.util.StringHelper;
 import org.lwjgl.opengl.GL11;
@@ -43,18 +44,17 @@ public class BaseGuiButton extends GuiButton {
 		drawHoveringText(text, x, y, 0xffffff);
 	}
 
-	protected void draw(Minecraft mc, int mouseX, int mouseY) {
-
+	public void drawTooltip(int x, int y) {
+		drawHoveringText(getTooltip(), x, y);
 	}
 
-	public void drawTooltip(int x, int y) {
-		drawHoveringText(tooltip, x, y);
+	protected List<String> getTooltip() {
+		return tooltip;
 	}
 
 	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 		super.drawButton(mc, mouseX, mouseY);
-		draw(mc, mouseX, mouseY);
 	}
 
 }

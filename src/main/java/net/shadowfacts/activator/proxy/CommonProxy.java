@@ -15,6 +15,7 @@ import net.shadowfacts.activator.event.FMLEventHandler;
 import net.shadowfacts.activator.gui.GuiHandler;
 import net.shadowfacts.activator.network.PacketUpdateTE;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
+import net.shadowfacts.activator.tileentity.TileEntityRedstoneActivator;
 
 /**
  * @author shadowfacts
@@ -49,6 +50,7 @@ public class CommonProxy {
 
     private void registerTileEntities() {
 		GameRegistry.registerTileEntity(TileEntityActivator.class, "activator");
+		GameRegistry.registerTileEntity(TileEntityRedstoneActivator.class, "activator.redstone");
     }
 
 	private void registerPackets() {
