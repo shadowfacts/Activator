@@ -9,6 +9,9 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import net.shadowfacts.activator.Activator;
+import net.shadowfacts.activator.compat.modules.CompatEnderIO;
+import net.shadowfacts.activator.compat.modules.CompatNEI;
+import net.shadowfacts.activator.compat.modules.CompatThermalFoundation;
 import net.shadowfacts.activator.compat.modules.waila.CompatWaila;
 
 import java.lang.reflect.InvocationTargetException;
@@ -23,16 +26,18 @@ public class ModCompat {
 	private static BiMap<String, Class> classes = HashBiMap.create();
 
 	static {
-		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) registerClientModules();
 		registerCommonModules();
+		if (FMLCommonHandler.instance().getSide() == Side.CLIENT) registerClientModules();
 	}
 
 	private static void registerClientModules() {
 		register(CompatWaila.class);
+		register(CompatNEI.class);
 	}
 
 	private static void registerCommonModules() {
-
+		register(CompatEnderIO.class);
+		register(CompatThermalFoundation.class);
 	}
 
 	private static void register(Class<?> clazz) {

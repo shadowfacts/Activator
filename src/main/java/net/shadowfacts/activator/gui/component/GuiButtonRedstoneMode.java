@@ -42,38 +42,26 @@ public class GuiButtonRedstoneMode extends BaseGuiButton {
 	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 		super.drawButton(mc, mouseX, mouseY);
-//		GL11.glPushMatrix();
-//
-//		GL11.glTranslatef(68, 26, 0);
-//		GL11.glScalef(0.75f, 0.75f, 0.75f);
-
-//		TODO: Fix texture (scale image to 512^2, 
 
 		mc.getTextureManager().bindTexture(texture);
 		switch (mode) {
 			case ALWAYS:
-//				drawTexturedModalRect(xPosition, yPosition, 84, 0, width, height);
 				drawTexturedModalRect(xPosition, yPosition, 42, 0, width, height);
 				break;
 			case NEVER:
-//				drawTexturedModalRect(xPosition, yPosition, 124, 0, width, height);
 				drawTexturedModalRect(xPosition, yPosition, 62, 0, width, height);
 				break;
 			case HIGH:
-//				drawTexturedModalRect(xPosition, yPosition, 42, 0, width, height);
 				drawTexturedModalRect(xPosition, yPosition, 21, 0, width, height);
 				break;
 			case LOW:
-//				drawTexturedModalRect(xPosition, yPosition, 0, 0, width, height);
 				drawTexturedModalRect(xPosition, yPosition, 0, 0, width, height);
 				break;
 			case PULSE:
-//				drawTexturedModalRect(xPosition, yPosition, 164, 0, width, height);
 				drawTexturedModalRect(xPosition, yPosition, 82, 0, width, height);
 				break;
 		}
 
-//		GL11.glPopMatrix();
 	}
 
 	@Override

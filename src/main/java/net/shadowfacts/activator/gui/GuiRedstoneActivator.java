@@ -27,7 +27,7 @@ public class GuiRedstoneActivator extends BaseGuiContainer {
 	private GuiButtonRedstoneMode redstoneMode;
 
 	public GuiRedstoneActivator(InventoryPlayer playerInv, TileEntityRedstoneActivator activator) {
-		super(new ContainerActivator(playerInv, activator)); // TODO: Container
+		super(new ContainerActivator(playerInv, activator));
 		this.activator = activator;
 	}
 

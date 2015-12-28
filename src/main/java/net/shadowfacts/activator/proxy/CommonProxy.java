@@ -7,7 +7,12 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.achievement.ModAchievements;
@@ -36,8 +41,6 @@ public class CommonProxy {
 
         ModAchievements.registerAchievements();
 
-		registerRecipes();
-
 		Activator.network = NetworkRegistry.INSTANCE.newSimpleChannel(Activator.name);
 		registerPackets();
 
@@ -47,6 +50,9 @@ public class CommonProxy {
 	}
 
 	public void init(FMLInitializationEvent event) {
+		registerRecipes();
+		registerOreDict();
+
 		ModCompat.init(event);
 	}
 
@@ -66,11 +72,19 @@ public class CommonProxy {
 	}
 
 	private void registerRecipes() {
-//		TODO: Recipes
-		if (ActivatorConfig.basicEnabled) ;
-		if (ActivatorConfig.redstoneEnabled) ;
-		if (ActivatorConfig.rfEnabled) ;
-		if (ActivatorConfig.euEnabled) ;
+		GameRegistry.addShapedRecipe(new ItemStack(Activator.items.gear), " S ", "SCS", " S ", 'S', Items.stick, 'C', Blocks.cobblestone);
+
+		if (ActivatorConfig.basicEnabled) {
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Activator.blocks.activator), "IPI", "IGI", "IBI", 'I', "ingotIron", 'P', Blocks.piston, 'G', "itemBasicGear", 'B', Blocks.stone_button));
+		}
+		if (ActivatorConfig.redstoneEnabled) {
+			GameRegistry.addShapelessRecipe(new ItemStack(Activator.blocks.redstoneActivator), Activator.blocks.activator, Items.redstone, Items.redstone);
+			GameRegistry.addShapelessRecipe(new ItemStack(Activator.blocks.redstoneActivator, 3), Activator.blocks.activator, Activator.blocks.activator, Activator.blocks.activator, Items.redstone, Items.redstone, Items.redstone, Items.redstone, Items.redstone, Items.redstone);
+		}
+	}
+
+	private void registerOreDict() {
+		OreDictionary.registerOre("itemBasicGear", Activator.items.gear);
 	}
 
 	public World getClientWorld() {
