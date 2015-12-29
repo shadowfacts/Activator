@@ -1,15 +1,16 @@
 package net.shadowfacts.activator.block;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.stats.Achievement;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.ActivatorConfig;
@@ -23,6 +24,13 @@ import net.shadowfacts.activator.tileentity.TileEntityActivator;
  */
 public class BlockActivator extends Block implements ITileEntityProvider, AchievementProvider {
 
+	@SideOnly(Side.CLIENT)
+	protected IIcon top;
+	@SideOnly(Side.CLIENT)
+	protected IIcon frontHorizontal;
+	@SideOnly(Side.CLIENT)
+	protected IIcon frontVertical;
+
 	protected BlockActivator(Material material) {
 		super(material);
 	}
@@ -31,7 +39,6 @@ public class BlockActivator extends Block implements ITileEntityProvider, Achiev
 		this(Material.rock);
 		if (ActivatorConfig.basicEnabled) setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator");
-		setBlockTextureName(Activator.modId + ":activator");
 		setHardness(1f);
 		setHarvestLevel("pickaxe", 2);
 	}
@@ -53,11 +60,30 @@ public class BlockActivator extends Block implements ITileEntityProvider, Achiev
 	}
 
 	@Override
-	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
-		if (side == world.getBlockMetadata(x, y, z)) {
-			return Blocks.diamond_block.getIcon(side, side);
+	@SideOnly(Side.CLIENT)
+	public IIcon getIcon(int side, int meta) {
+		if (side == 0 || side == 1) {
+			if (side == meta) {
+				return frontVertical;
+			} else {
+				return top;
+			}
+		} else {
+			if (side == meta) {
+				return frontHorizontal;
+			} else {
+				return blockIcon;
+			}
 		}
-		return super.getIcon(world, x, y, z, side);
+	}
+
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerBlockIcons(IIconRegister p_149651_1_) {
+		this.blockIcon = p_149651_1_.registerIcon("furnace_side");
+		this.top = p_149651_1_.registerIcon("furnace_top");
+		this.frontHorizontal = p_149651_1_.registerIcon("dispenser_front_horizontal");
+		this.frontVertical = p_149651_1_.registerIcon("dispenser_front_vertical");
 	}
 
 	@Override

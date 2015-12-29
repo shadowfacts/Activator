@@ -22,7 +22,6 @@ public class BlockRFActivator extends BlockActivator {
 		super(Material.rock);
 		if (ActivatorConfig.rfEnabled) setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator.rf");
-		setBlockTextureName(Activator.modId + ":activator-rf");
 		setHardness(1f);
 		setHarvestLevel("pickaxe", 2);
 	}
