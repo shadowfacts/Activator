@@ -6,9 +6,11 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.shadowfacts.activator.gui.component.BaseGuiButton;
+import net.shadowfacts.activator.gui.component.BaseGuiComponent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -17,7 +19,9 @@ import java.util.stream.Stream;
  */
 public abstract class BaseGuiContainer extends GuiContainer {
 
-	public BaseGuiContainer(Container container) {
+	protected List<BaseGuiComponent> components = new ArrayList<>();
+
+	BaseGuiContainer(Container container) {
 		super(container);
 	}
 

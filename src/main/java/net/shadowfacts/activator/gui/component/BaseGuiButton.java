@@ -50,6 +50,10 @@ public class BaseGuiButton extends GuiButton {
 		return tooltip;
 	}
 
+	public boolean isVisible(int mouseX, int mouseY) {
+		return visible;
+	}
+
 	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY) {
 		super.drawButton(mc, mouseX, mouseY);

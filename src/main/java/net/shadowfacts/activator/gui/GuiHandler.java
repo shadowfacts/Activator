@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.shadowfacts.activator.container.ContainerActivator;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
+import net.shadowfacts.activator.tileentity.TileEntityRFActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRedstoneActivator;
 
 /**
@@ -33,7 +34,7 @@ public class GuiHandler implements IGuiHandler {
 			case REDSTONE:
 				return new GuiRedstoneActivator(player.inventory, (TileEntityRedstoneActivator)world.getTileEntity(x, y, z));
 			case RF:
-				return new GuiActivator(player.inventory, (TileEntityActivator)world.getTileEntity(x, y, z));
+				return new GuiRFActivator(player.inventory, (TileEntityRFActivator)world.getTileEntity(x, y, z));
 		}
 		return null;
 	}

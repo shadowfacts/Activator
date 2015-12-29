@@ -28,7 +28,7 @@ public class TileEntityRedstoneActivator extends TileEntityActivator {
 		super.updateEntity();
 	}
 
-	private boolean canActivate() {
+	private boolean validateRedstone() {
 		switch (redstoneMode) {
 			case ALWAYS:
 				return true;
@@ -47,17 +47,17 @@ public class TileEntityRedstoneActivator extends TileEntityActivator {
 
 	@Override
 	protected boolean canAttackEntity(Entity entity, ItemStack stack) {
-		return canActivate();
+		return validateRedstone();
 	}
 
 	@Override
 	protected boolean canBreakBlock(int x, int y, int z, Block block, ItemStack stack) {
-		return canActivate();
+		return validateRedstone();
 	}
 
 	@Override
 	protected boolean canRightClick(ItemStack stack) {
-		return canActivate();
+		return validateRedstone();
 	}
 
 //	Persistence

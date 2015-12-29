@@ -32,7 +32,8 @@ public class BlockActivator extends Block implements ITileEntityProvider, Achiev
 		if (ActivatorConfig.basicEnabled) setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator");
 		setBlockTextureName(Activator.modId + ":activator");
-		setHardness(.5f);
+		setHardness(1f);
+		setHarvestLevel("pickaxe", 2);
 	}
 
 	@Override

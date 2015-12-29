@@ -23,7 +23,8 @@ public class BlockRedstoneActivator extends BlockActivator {
 		if (ActivatorConfig.redstoneEnabled) setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator.redstone");
 		setBlockTextureName(Activator.modId + ":activator-redstone");
-		setHardness(.5f);
+		setHardness(1f);
+		setHarvestLevel("pickaxe", 2);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.stats.Achievement;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.ActivatorConfig;
@@ -22,12 +23,18 @@ public class BlockRFActivator extends BlockActivator {
 		if (ActivatorConfig.rfEnabled) setCreativeTab(CreativeTabs.tabMisc);
 		setBlockName("activator.rf");
 		setBlockTextureName(Activator.modId + ":activator-rf");
-		setHardness(.5f);
+		setHardness(1f);
+		setHarvestLevel("pickaxe", 2);
 	}
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		player.openGui(Activator.instance, GUI.RF.ordinal(), world, x, y, z);
+		return true;
+	}
+
+	@Override
+	public boolean shouldCheckWeakPower(IBlockAccess world, int x, int y, int z, int side) {
 		return true;
 	}
 

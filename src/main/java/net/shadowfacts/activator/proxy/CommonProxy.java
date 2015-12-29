@@ -19,6 +19,7 @@ import net.shadowfacts.activator.achievement.ModAchievements;
 import net.shadowfacts.activator.compat.ModCompat;
 import net.shadowfacts.activator.event.FMLEventHandler;
 import net.shadowfacts.activator.gui.GuiHandler;
+import net.shadowfacts.activator.network.PacketRequestTEUpdate;
 import net.shadowfacts.activator.network.PacketUpdateTE;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRFActivator;
@@ -69,6 +70,7 @@ public class CommonProxy {
 	private void registerPackets() {
 		Activator.network.registerMessage(PacketUpdateTE.ServerHandler.class, PacketUpdateTE.class, 0, Side.SERVER);
 		Activator.network.registerMessage(PacketUpdateTE.ClientHandler.class, PacketUpdateTE.class, 0, Side.CLIENT);
+		Activator.network.registerMessage(PacketRequestTEUpdate.ServerHandler.class, PacketRequestTEUpdate.class, 1, Side.SERVER);
 	}
 
 	private void registerRecipes() {
