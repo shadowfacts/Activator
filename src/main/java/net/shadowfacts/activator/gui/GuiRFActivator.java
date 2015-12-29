@@ -87,14 +87,12 @@ public class GuiRFActivator extends BaseGuiContainer {
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-
 		GL11.glColor4f(1, 1, 1, 1);
 		mc.getTextureManager().bindTexture(bgTexture);
-		drawTexturedModalRect(guiLeft, guiTop, 0, 0, width, height);
+		drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
 		String s = String.format("%d ticks", activator.activateFrequency);
 		drawString(mc.fontRenderer, s, guiLeft + (xSize / 2) - (mc.fontRenderer.getStringWidth(s) / 2), guiTop + 41, 0xffffff);
-//		TODO: fix string position
 
 		if (ticks % 40 == 0) Activator.network.sendToServer(new PacketRequestTEUpdate(activator));
 		rfIndicator.draw();
