@@ -1,5 +1,6 @@
 package net.shadowfacts.activator.item;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.shadowfacts.activator.Activator;
 
@@ -11,6 +12,7 @@ public class BaseItem extends Item {
 	public BaseItem(String unlocName, String textureName) {
 		setUnlocalizedName(unlocName);
 		setTextureName(Activator.modId + ":" + textureName);
+		setCreativeTab(CreativeTabs.tabMisc);
 	}
 
 }
