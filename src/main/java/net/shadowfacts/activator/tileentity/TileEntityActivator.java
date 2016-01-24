@@ -22,6 +22,7 @@ import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.misc.ActivatorAction;
 
 import java.util.ArrayList;
@@ -432,27 +433,32 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 	}
 
 	private boolean tryHarvestBlock(int x, int y, int z) {
-		ItemStack stack = getStackInSlot(0);
-		if (stack != null && stack.getItem().onBlockStartBreak(stack, x, y, z, player)) {
+		try {
+			ItemStack stack = getStackInSlot(0);
+			if (stack != null && stack.getItem().onBlockStartBreak(stack, x, y, z, player)) {
+				return false;
+			}
+
+			Block block = worldObj.getBlock(x, y, z);
+			int meta = worldObj.getBlockMetadata(x, y, z);
+
+			boolean ret;
+			boolean var1 = false;
+			if (block != null) {
+				var1 = block.canHarvestBlock(player, meta);
+			}
+			if (stack != null) {
+				stack.getItem().onBlockDestroyed(stack, worldObj, block, x, y, z, player);
+			}
+			ret = removeBlock(x, y, z);
+			if (ret && var1) {
+				block.harvestBlock(worldObj, player, x, y, z, meta);
+			}
+			return ret;
+		} catch (Exception e) {
+			Activator.log.error("Problem harvesting block (" + e.toString() + ")");
 			return false;
 		}
-
-		Block block = worldObj.getBlock(x, y, z);
-		int meta = worldObj.getBlockMetadata(x, y, z);
-
-		boolean ret;
-		boolean var1 = false;
-		if (block != null) {
-			var1 = block.canHarvestBlock(player, meta);
-		}
-		if (stack != null) {
-			stack.getItem().onBlockDestroyed(stack, worldObj, block, x, y, z, player);
-		}
-		ret = removeBlock(x, y, z);
-		if (ret && var1) {
-			block.harvestBlock(worldObj, player, x, y, z, meta);
-		}
-		return ret;
 	}
 
 	private boolean removeBlock(int x, int y, int z) {
