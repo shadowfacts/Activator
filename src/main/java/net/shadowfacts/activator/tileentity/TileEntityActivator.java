@@ -1,8 +1,9 @@
 package net.shadowfacts.activator.tileentity;
 
 import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.common.eventhandler.Event;
+import lombok.Getter;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,15 +15,21 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.*;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
+import net.shadowfacts.activator.Activator;
+import net.shadowfacts.activator.block.BlockActivator;
 import net.shadowfacts.activator.misc.ActivatorAction;
+import net.shadowfacts.shadowmc.tileentity.BaseTileEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,44 +38,48 @@ import java.util.UUID;
 /**
  * @author shadowfacts
  */
-public class TileEntityActivator extends BaseTileEntity implements IInventory {
+public class TileEntityActivator extends BaseTileEntity implements IInventory, ITickable {
 
 	private static final String INVENTORY = "Inventory";
 	private static final String SLOT = "Slot";
 	private static final String ACTIVATE_FREQUENCY = "ActivateFrequency";
 	private static final String ACTION = "Action";
 	private static final String SNEAKING = "Sneaking";
-	private static final int MIN_UPDATE_FREQ = 20;
-	private static final int MAX_UPDATE_FREQ = 1200;
+	public static final int MIN_UPDATE_FREQ = 20;
+	public static final int MAX_UPDATE_FREQ = 1200;
 
 	private static GameProfile profile = new GameProfile(UUID.fromString("52693A97-8EDB-5135-FE67-24B3600AEC87"), "[Activator]");
 
 //	Persistent
 	private ItemStack[] inventory = new ItemStack[1];
-	public int activateFrequency = 20;
-	public ActivatorAction action = ActivatorAction.RIGHT_CLICK;
+	public int activationFrequency = 20;
+	@Getter
+	private ActivatorAction action = ActivatorAction.RIGHT_CLICK;
 	public boolean sneaking = false;
 
-//	Not persistent
+//	Non-persistent
 	private int ticks = 0;
 	private FakePlayer player;
 
-	private boolean isBreaking = false;
-	private int initialBlockDamage = 0;
-	private int curBlockDamage = 0;
-	private int durabilityRemainingOnBlock;
+	private boolean isBreaking;
+	private int initialBlockDamage;
+	private int curBlockDamage;
+	private int durabilityRemaining;
 
 	private List<Entity> detectedEntities = new ArrayList<>();
 
+	public TileEntityActivator() {
 
-//	Updating
+	}
+
 	protected Action activate() {
 		FakePlayer player = getPlayer();
 
-		ForgeDirection facing = getFacing();
-		double playerX = xCoord;
-		double playerY = yCoord - 1;
-		double playerZ = zCoord;
+		EnumFacing facing = getFacing();
+
+		double playerX = pos.getX();
+		double playerY = pos.getY() - 1;
+		double playerZ = pos.getZ();
 		float yaw = 0;
 		float pitch = 0;
 
@@ -101,59 +112,50 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 
 		player.setLocationAndAngles(playerX, playerY, playerZ, yaw, pitch);
 
-		ChunkCoordinates target = getTargetLoc();
+		BlockPos target = getTargetLoc();
 
 		ItemStack stack = getStackInSlot(0);
 
-		Block targetBlock = worldObj.getBlock(target.posX, target.posY, target.posZ);
+		IBlockState targetState = worldObj.getBlockState(target);
 
 		Action result = Action.NOTHING;
 		boolean done = false;
 
-		player.setSneaking(sneaking);
-
 		if (action == ActivatorAction.LEFT_CLICK) {
 			detectEntities(target);
 			Entity entity = detectedEntities.isEmpty() ? null : detectedEntities.get(worldObj.rand.nextInt(detectedEntities.size()));
-			if (entity != null && canAttackEntity(entity, stack)) { // attack entity
+			if (entity != null && canAttackEntity(entity, stack)) {
 				if (stack != null) player.getAttributeMap().applyAttributeModifiers(stack.getAttributeModifiers());
 				player.attackTargetEntityWithCurrentItem(entity);
 				result = Action.ATTACK_ENTITY;
 				done = true;
-			} else if (!isBreaking && canBreakBlock(target.posX, target.posY, target.posZ, targetBlock, stack)) { // break block
-				if (!targetBlock.isAir(worldObj, target.posX, target.posY, target.posZ) &&
-						targetBlock.getBlockHardness(worldObj, target.posX, target.posY, target.posZ) >= 0) {
+			} else if (!isBreaking && canBreakBlock(target, targetState, stack)) {
+				if (!targetState.getBlock().isAir(worldObj, target) &&
+						targetState.getBlock().getBlockHardness(worldObj, target) >= 0) {
 					isBreaking = true;
-					startBreaking(targetBlock, worldObj.getBlockMetadata(target.posX, target.posY, target.posZ));
+					startBreaking(targetState);
 					result = Action.BREAK_BLOCK;
 					done = true;
 				}
 			}
 		} else if (action == ActivatorAction.RIGHT_CLICK && canRightClick(stack)) {
 
-			ForgeDirection side = facing.getOpposite();
+			EnumFacing side = facing.getOpposite();
 
-			if (targetBlock.isAir(worldObj, target.posX, target.posY, target.posZ)) {
+			if (targetState.getBlock().isAir(worldObj, target)) {
 				for (int i = 1; i < 5; i++) {
-					int x = target.posX;
-					int y = target.posY;
-					int z = target.posZ;
-					x += facing.offsetX * i;
-					y += facing.offsetY * i;
-					z += facing.offsetZ * i;
-					Block block = worldObj.getBlock(x, y, z);
-					if (!block.isAir(worldObj, x, y, z)) {
-						targetBlock = block;
-						target = new ChunkCoordinates(x, y, z);
+					BlockPos nextTarget = target.offset(facing, i);
+					IBlockState state = worldObj.getBlockState(target);
+					if (!state.getBlock().isAir(worldObj, target)) {
+						targetState = state;
+						target = nextTarget;
 						break;
 					}
 				}
 			}
 
-
-			PlayerInteractEvent.Action action = targetBlock.isAir(worldObj, target.posX, target.posY, target.posZ) ? PlayerInteractEvent.Action.RIGHT_CLICK_AIR : PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK;
-			PlayerInteractEvent event = ForgeEventFactory.onPlayerInteract(player, action, target.posX, target.posY, target.posZ, side.ordinal(), worldObj);
-
+			PlayerInteractEvent.Action action = targetState.getBlock().isAir(worldObj, target) ? PlayerInteractEvent.Action.RIGHT_CLICK_AIR : PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK;
+			PlayerInteractEvent event = ForgeEventFactory.onPlayerInteract(player, action, worldObj, target, side);
 
 			if (!event.isCanceled()) {
 				result = Action.RIGHT_CLICK;
@@ -162,13 +164,13 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 				done = entity != null && (entity instanceof EntityLiving && stack.getItem().itemInteractionForEntity(stack, player, (EntityLivingBase) entity) || (!(entity instanceof EntityAnimal) || ((EntityAnimal) entity).interact(player)));
 
 				if (!done && stack != null) {
-					stack.getItem().onItemUseFirst(stack, player, worldObj, target.posX, target.posY, target.posZ, side.ordinal(), 0, 0, 0);
+					stack.getItem().onItemUse(stack, player, worldObj, target, side, 0, 0, 0);
 				}
 				if (!done) {
-					done = targetBlock.onBlockActivated(worldObj, target.posX, target.posY, target.posZ, player, side.ordinal(), 0, 0, 0);
+					done = targetState.getBlock().onBlockActivated(worldObj, target, targetState, player, side, 0, 0, 0);
 				}
 				if (!done && stack != null) {
-					done = stack.getItem().onItemUse(stack, player, worldObj, target.posX, target.posY, target.posZ, side.ordinal(), 0, 0, 0);
+					done = stack.getItem().onItemUse(stack, player, worldObj, target, side, 0, 0, 0);
 				}
 				if (!done && stack != null) {
 					stack = stack.getItem().onItemRightClick(stack, worldObj, player);
@@ -183,8 +185,6 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 			} else {
 				setInventorySlotContents(0, stack);
 			}
-
-			sync();
 		}
 
 		markDirty();
@@ -193,7 +193,7 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 	}
 
 	/**
-	 * Called to check if the activator can attack the entity.
+	 * Called to check if the activator can attack the entity
 	 * Used to check any non-normal stuff, e.g. energy or redstone state
 	 * @param entity The entity to attack
 	 * @param stack The stack being attacked with
@@ -206,46 +206,44 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 	/**
 	 * Called to check if the activator can break the block
 	 * Used to check any non-normal stuff, e.g. energy or redstone state
-	 * @param x The X coordinate of the block
-	 * @param y The Y coordinate of the block
-	 * @param z The Z coordinate of the block
-	 * @param block The block to be broken
-	 * @param stack The stack being used as a tool
+	 * @param pos The coordinates of the block being broken
+	 * @param state The state of the block being broken
+	 * @param stack The stack the block is being broken with
 	 * @return If the block can be broken
 	 */
-	protected boolean canBreakBlock(int x, int y, int z, Block block, ItemStack stack) {
+	protected boolean canBreakBlock(BlockPos pos, IBlockState state, ItemStack stack) {
 		return true;
 	}
 
 	/**
 	 * Called to check if the activator can right-click
 	 * Used to check any non-normal stuff, e.g. energy or redstone state
-	 * @param stack The stack to right-click with
-	 * @return If the stack can be right-clicked
+	 * @param stack The stack to be right-clicked
+	 * @return If the stack can be right click
 	 */
 	protected boolean canRightClick(ItemStack stack) {
 		return true;
 	}
 
 	/**
-	 * Called immediately after the activator activates
-	 * @param action The action that was performed
+	 * Called immediately after the activator actives
+	 * @param action The action that was performed by the activator
 	 */
 	protected void postActivate(Action action) {
 
 	}
 
 	@Override
-	public void updateEntity() {
+	public void update() {
 		if (!worldObj.isRemote) {
 			if (isBreaking) {
-				ChunkCoordinates coords = getTargetLoc();
-				Block block = worldObj.getBlock(coords.posX, coords.posY, coords.posZ);
-				if (block != Blocks.air && !block.isAir(worldObj, coords.posX, coords.posY, coords.posZ)) {
+				BlockPos target = getTargetLoc();
+				IBlockState targetState = worldObj.getBlockState(target);
+				if (targetState.getBlock() != Blocks.air && !targetState.getBlock().isAir(worldObj, target)) {
 					continueBreaking();
 				}
 			} else {
-				if (ticks % activateFrequency == 0) {
+				if (ticks % activationFrequency == 0) {
 					ticks = 0;
 					postActivate(activate());
 					sync();
@@ -255,21 +253,21 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 		}
 	}
 
-	//	Persistence
+//	Persistence
 	@Override
-	public NBTTagCompound save(NBTTagCompound tag) {
-		NBTTagList inventoryTagList = new NBTTagList();
-		for (int i = 0; i < inventory.length; ++i) {
+	public NBTTagCompound save(NBTTagCompound tag, boolean saveInventory) {
+		NBTTagList invTagList = new NBTTagList();
+		for (int i = 0; i < inventory.length; i++) {
 			if (inventory[i] != null) {
-				NBTTagCompound savedStack = new NBTTagCompound();
-				savedStack.setInteger(SLOT, i);
-				inventory[i].writeToNBT(savedStack);
-				inventoryTagList.appendTag(savedStack);
+				NBTTagCompound itemTag = new NBTTagCompound();
+				itemTag.setInteger(SLOT, i);
+				inventory[i].writeToNBT(itemTag);
+				invTagList.appendTag(itemTag);
 			}
 		}
 
-		tag.setTag(INVENTORY, inventoryTagList);
-		tag.setInteger(ACTIVATE_FREQUENCY, activateFrequency);
+		tag.setTag(INVENTORY, invTagList);
+		tag.setInteger(ACTIVATE_FREQUENCY, activationFrequency);
 		tag.setInteger(ACTION, action.ordinal());
 		tag.setBoolean(SNEAKING, sneaking);
 		return tag;
@@ -277,22 +275,23 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 
 	@Override
 	public void load(NBTTagCompound tag) {
-		NBTTagList inventoryTagList = tag.getTagList(INVENTORY, 10);
-		for (int i = 0; i < inventoryTagList.tagCount(); ++i) {
-			NBTTagCompound savedStack = inventoryTagList.getCompoundTagAt(i);
-			int slot = savedStack.getInteger(SLOT);
+		NBTTagList invTagList = tag.getTagList(INVENTORY, 10);
+		for (int i = 0; i < invTagList.tagCount(); i++) {
+			NBTTagCompound itemTag = invTagList.getCompoundTagAt(i);
+			int slot = itemTag.getInteger(SLOT);
 			if (slot >= 0 && slot < getSizeInventory()) {
-				inventory[slot] = ItemStack.loadItemStackFromNBT(savedStack);
+				inventory[slot] = ItemStack.loadItemStackFromNBT(itemTag);
 			}
 		}
-		activateFrequency = tag.getInteger(ACTIVATE_FREQUENCY);
-		action = ActivatorAction.get(tag.getInteger(ACTION));
+
+		activationFrequency = tag.getInteger(ACTIVATE_FREQUENCY);
+		action = ActivatorAction.values()[tag.getInteger(ACTION)];
 		sneaking = tag.getBoolean(SNEAKING);
 	}
 
-	//	Utilities
-	protected ForgeDirection getFacing() {
-		return ForgeDirection.getOrientation(getBlockMetadata());
+//	Utilities
+	protected EnumFacing getFacing() {
+		return worldObj.getBlockState(pos).getValue(BlockActivator.FACING);
 	}
 
 	private FakePlayer getPlayer() {
@@ -303,23 +302,17 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 		return player;
 	}
 
-	private ChunkCoordinates getTargetLoc() {
-		ChunkCoordinates coords = new ChunkCoordinates(xCoord, yCoord, zCoord);
-		ForgeDirection facing = getFacing();
-		coords.posX += facing.offsetX;
-		coords.posY += facing.offsetY;
-		coords.posZ += facing.offsetZ;
-		return coords;
+	private BlockPos getTargetLoc() {
+		return getPos().offset(getFacing());
 	}
 
-	@SuppressWarnings("unchecked")
-	private void detectEntities(ChunkCoordinates coords) {
-		double minX = coords.posX;
-		double minY = coords.posY;
-		double minZ = coords.posZ;
-		double maxX = coords.posX + 1;
-		double maxY = coords.posY + 1;
-		double maxZ = coords.posZ + 1;
+	private void detectEntities(BlockPos pos) {
+		double minX = pos.getX();
+		double minY = pos.getY();
+		double minZ = pos.getZ();
+		double maxX = pos.getX() + 1;
+		double maxY = pos.getY() + 1;
+		double maxZ = pos.getZ() + 1;
 
 		switch (getFacing()) {
 			case DOWN:
@@ -329,7 +322,7 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 				maxY += 5;
 				break;
 			case NORTH:
-				minZ -= 5;
+				minZ -=5;
 				break;
 			case SOUTH:
 				maxZ += 5;
@@ -339,35 +332,34 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 				break;
 			case EAST:
 				maxX += 5;
-				break;
 		}
 
-		AxisAlignedBB box = AxisAlignedBB.getBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+		AxisAlignedBB box = AxisAlignedBB.fromBounds(minX, minY, minZ, maxX, maxY, maxZ);
 		detectedEntities = worldObj.getEntitiesWithinAABB(Entity.class, box);
 	}
 
-	public void increaseActivateFrequency(int amount) {
-		activateFrequency = Math.min(activateFrequency + amount, MAX_UPDATE_FREQ);
+	public void increaseActivationFrequency(int amount) {
+		activationFrequency = Math.min(activationFrequency + amount, MAX_UPDATE_FREQ);
 	}
 
-	public void decreaseActivateFrequency(int amount) {
-		activateFrequency = Math.max(activateFrequency - amount, MIN_UPDATE_FREQ);
+	public void decreaseActivationFrequency(int amount) {
+		activationFrequency = Math.max(activationFrequency - amount, MIN_UPDATE_FREQ);
 	}
 
 	public void dropInventory() {
 		ItemStack stack = getStackInSlot(0);
 		if (stack != null && stack.stackSize > 0) {
-			EntityItem entityItem = new EntityItem(worldObj, xCoord, yCoord, zCoord, stack);
-			worldObj.spawnEntityInWorld(entityItem);
+			EntityItem item = new EntityItem(worldObj, pos.getX(), pos.getY(), pos.getZ(), stack);
+			worldObj.spawnEntityInWorld(item);
 		}
 	}
 
 //	Block breaking
-	private void startBreaking(Block block, int meta) {
-		ForgeDirection side = getFacing().getOpposite();
-		ChunkCoordinates coords = getTargetLoc();
+	private void startBreaking(IBlockState state) {
+		EnumFacing side = getFacing().getOpposite();
+		BlockPos pos = getTargetLoc();
 
-		PlayerInteractEvent event = ForgeEventFactory.onPlayerInteract(player, PlayerInteractEvent.Action.LEFT_CLICK_BLOCK, coords.posX, coords.posY, coords.posZ, side.ordinal(), worldObj);
+		PlayerInteractEvent event = ForgeEventFactory.onPlayerInteract(player, PlayerInteractEvent.Action.LEFT_CLICK_BLOCK, worldObj, pos, side);
 		if (event.isCanceled()) {
 			stopBreaking();
 			return;
@@ -376,9 +368,9 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 		initialBlockDamage = curBlockDamage;
 		float f = 1f;
 
-		if (block != null) {
+		if (state.getBlock() != null) {
 			if (event.useBlock != Event.Result.DENY) {
-				f = block.getPlayerRelativeBlockHardness(player, worldObj, coords.posX, coords.posY, coords.posZ);
+				f = state.getBlock().getPlayerRelativeBlockHardness(player, worldObj, pos);
 			}
 		}
 
@@ -388,94 +380,100 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 		}
 
 		if (f >= 1f) {
-			tryHarvestBlock(coords.posX, coords.posY, coords.posZ);
+			tryHarvestBlock(pos);
 			stopBreaking();
 		} else {
 			int remaining = (int)(f * 10);
-			worldObj.destroyBlockInWorldPartially(player.getEntityId(), coords.posX, coords.posY, coords.posZ, remaining);
-			durabilityRemainingOnBlock = remaining;
+			worldObj.sendBlockBreakProgress(player.getEntityId(), pos, remaining);
+			durabilityRemaining = remaining;
 		}
-
 	}
 
 	private void stopBreaking() {
 		isBreaking = false;
-		ChunkCoordinates coords = getTargetLoc();
-		worldObj.destroyBlockInWorldPartially(player.getEntityId(), coords.posX, coords.posY, coords.posZ, -1);
+		BlockPos pos = getTargetLoc();
+		worldObj.sendBlockBreakProgress(player.getEntityId(), pos, -1);
 		curBlockDamage = 0;
 		initialBlockDamage = 0;
 	}
 
 	private void continueBreaking() {
 		++curBlockDamage;
-		ChunkCoordinates coords = getTargetLoc();
+		BlockPos pos = getTargetLoc();
 
-		Block block = worldObj.getBlock(coords.posX, coords.posY, coords.posZ);
+		IBlockState state = worldObj.getBlockState(pos);
 
 		int i = curBlockDamage - initialBlockDamage;
 
-		if (block == Blocks.air) {
+		if (state.getBlock() == Blocks.air) {
 			stopBreaking();
 		} else {
-			float remaining = block.getPlayerRelativeBlockHardness(player, worldObj, coords.posX, coords.posY, coords.posZ) * (float)(i + 1);
-			int left = (int)(remaining * 10);
-			if (left != durabilityRemainingOnBlock) {
-				worldObj.destroyBlockInWorldPartially(player.getEntityId(), coords.posX, coords.posY, coords.posZ, left);
-				durabilityRemainingOnBlock = left;
+			float remaining = blockType.getPlayerRelativeBlockHardness(player, worldObj, pos) * (float)(i + 1);
+			int iRemaining = (int)(remaining * 10);
+			if (iRemaining != durabilityRemaining) {
+				worldObj.sendBlockBreakProgress(player.getEntityId(), pos, iRemaining);
+				durabilityRemaining = iRemaining;
 			}
 
 			if (remaining >= 1f) {
 				stopBreaking();
-				tryHarvestBlock(coords.posX, coords.posY, coords.posZ);
+				tryHarvestBlock(pos);
 			}
 		}
 	}
 
-	private boolean tryHarvestBlock(int x, int y, int z) {
-		ItemStack stack = getStackInSlot(0);
-		if (stack != null && stack.getItem().onBlockStartBreak(stack, x, y, z, player)) {
+	private boolean tryHarvestBlock(BlockPos pos) {
+		try {
+			ItemStack stack = getStackInSlot(0);
+			if (stack != null && stack.getItem().onBlockStartBreak(stack, pos, player)) {
+				return false;
+			}
+
+			IBlockState state = worldObj.getBlockState(pos);
+
+			boolean ret;
+			boolean var1 = false;
+			if (state.getBlock() != null) {
+				var1 = state.getBlock().canHarvestBlock(worldObj, pos, player);
+			}
+			if (stack != null) {
+				stack.getItem().onBlockDestroyed(stack, worldObj, state.getBlock(), pos, player);
+			}
+			ret = removeBlock(pos);
+			if (ret && var1) {
+				state.getBlock().harvestBlock(worldObj, player, pos, state, worldObj.getTileEntity(pos));
+			}
+			return ret;
+		} catch (Exception e) {
+			Activator.log.error("Problem harvesting block (" + e.toString() + ")");
 			return false;
 		}
-
-		Block block = worldObj.getBlock(x, y, z);
-		int meta = worldObj.getBlockMetadata(x, y, z);
-
-		boolean ret;
-		boolean var1 = false;
-		if (block != null) {
-			var1 = block.canHarvestBlock(player, meta);
-		}
-		if (stack != null) {
-			stack.getItem().onBlockDestroyed(stack, worldObj, block, x, y, z, player);
-		}
-		ret = removeBlock(x, y, z);
-		if (ret && var1) {
-			block.harvestBlock(worldObj, player, x, y, z, meta);
-		}
-		return ret;
 	}
 
-	private boolean removeBlock(int x, int y, int z) {
-		Block block = worldObj.getBlock(x, y, z);
-		int meta = worldObj.getBlockMetadata(x, y, z);
-
-		if (block != null) {
-			block.onBlockHarvested(worldObj, x, y, z, meta, player);
+	private boolean removeBlock(BlockPos pos) {
+		IBlockState state = worldObj.getBlockState(pos);
+		if (state.getBlock() != null) {
+			state.getBlock().onBlockHarvested(worldObj, pos, state, player);
 		}
-
 		boolean ret = false;
-		if (block != null) {
-			ret = block.removedByPlayer(worldObj, player, x, y, z, true);
+		if (state.getBlock() != null) {
+			ret = state.getBlock().removedByPlayer(worldObj, pos, player, true);
 			if (ret) {
-				worldObj.playAuxSFXAtEntity(player, 2001, x, y, z, Block.getIdFromBlock(block) + (worldObj.getBlockMetadata(x, y, z) << 12));
-				block.onBlockDestroyedByPlayer(worldObj, x, y, z, meta);
+				worldObj.playAuxSFXAtEntity(player, 2001, pos, Block.getIdFromBlock(state.getBlock()) + (state.getBlock().getMetaFromState(state) << 12));
+				blockType.onBlockDestroyedByPlayer(worldObj, pos, state);
 			}
 		}
-
 		return ret;
 	}
 
-//	IInventory
+	public void setAction(ActivatorAction action) {
+		if (this.action == ActivatorAction.LEFT_CLICK && isBreaking) {
+			stopBreaking();
+		}
+		this.action = action;
+	}
+
+	//	IInventory
 	@Override
 	public int getSizeInventory() {
 		return inventory.length;
@@ -508,7 +506,7 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 	}
 
 	@Override
-	public ItemStack getStackInSlotOnClosing(int slot) {
+	public ItemStack removeStackFromSlot(int slot) {
 		if (inventory[slot] != null) {
 			ItemStack stack = inventory[slot];
 			inventory[slot] = null;
@@ -520,20 +518,9 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack stack) {
 		inventory[slot] = stack;
-
 		if (stack != null && stack.stackSize > getInventoryStackLimit()) {
 			stack.stackSize = getInventoryStackLimit();
 		}
-	}
-
-	@Override
-	public String getInventoryName() {
-		return "activator";
-	}
-
-	@Override
-	public boolean hasCustomInventoryName() {
-		return false;
 	}
 
 	@Override
@@ -543,22 +530,70 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory {
 
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
-		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this && player.getDistanceSq(xCoord + .5d, yCoord + .5d, zCoord + .5d) <= 64d;
+		return player.getDistanceSq(pos) <= 64;
 	}
 
 	@Override
-	public void openInventory() {
-
-	}
-
-	@Override
-	public void closeInventory() {
+	public void openInventory(EntityPlayer player) {
 
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int slot, ItemStack stack) {
+	public void closeInventory(EntityPlayer player) {
+
+	}
+
+	@Override
+	public boolean isItemValidForSlot(int index, ItemStack stack) {
 		return true;
+	}
+
+	@Override
+	public int getField(int id) {
+		return 0;
+	}
+
+	@Override
+	public void setField(int id, int value) {
+
+	}
+
+	@Override
+	public int getFieldCount() {
+		return 0;
+	}
+
+	@Override
+	public void clear() {
+		for (int i = 0; i < inventory.length; i++) {
+			inventory[i] = null;
+		}
+	}
+
+	@Override
+	public String getName() {
+		return "activator";
+	}
+
+	@Override
+	public boolean hasCustomName() {
+		return false;
+	}
+
+	@Override
+	public IChatComponent getDisplayName() {
+		return new ChatComponentTranslation(getName());
+	}
+
+//	Capabilities
+	private IItemHandler itemHandler = new InvWrapper(this);
+
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			return (T)itemHandler;
+		}
+		return super.getCapability(capability, facing);
 	}
 
 	public enum Action {

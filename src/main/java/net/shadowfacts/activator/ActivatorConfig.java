@@ -1,8 +1,6 @@
 package net.shadowfacts.activator;
 
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import net.shadowfacts.shadowmc.config.Config;
-import net.shadowfacts.shadowmc.config.ConfigManager;
 import net.shadowfacts.shadowmc.config.ConfigProperty;
 
 /**
@@ -43,15 +41,5 @@ public class ActivatorConfig {
 
 	@ConfigProperty(name = "breakEnergy", category = "activator.eu", comment = "How much EU required to break a block")
 	public static int euBreakEnergy = 512;
-
-	@ConfigProperty(name = "rightClickEnergy", category = "activator.eu", comment = "How much EU required to right-click")
-	public static int euRightClickEnergy = 256;
-
-	public static void initialize(FMLPreInitializationEvent event) {
-		Activator.log.info("Loading config");
-		ConfigManager.instance.configDirPath = event.getModConfigurationDirectory().getAbsolutePath();
-		ConfigManager.instance.register(Activator.modId, ActivatorConfig.class);
-		ConfigManager.instance.load(Activator.modId);
-	}
 
 }

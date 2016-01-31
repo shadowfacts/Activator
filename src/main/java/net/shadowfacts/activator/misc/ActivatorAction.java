@@ -7,21 +7,17 @@ import net.shadowfacts.shadowmc.util.StringHelper;
  */
 public enum ActivatorAction {
 
-	LEFT_CLICK("activator.action.left"),
-	RIGHT_CLICK("activator.action.right");
+	RIGHT_CLICK("activator.action.right"),
+	LEFT_CLICK("activator.action.left");
 
-	private String unlocalizedName;
+	private String unlocalized;
 
-	ActivatorAction(String unlocalizedName) {
-		this.unlocalizedName = unlocalizedName;
+	ActivatorAction(String unlocalized) {
+		this.unlocalized = unlocalized;
 	}
 
 	public String getLocalizedName() {
-		return StringHelper.localize(unlocalizedName);
-	}
-
-	public static ActivatorAction get(int i) {
-		return values()[i];
+		return StringHelper.localize(unlocalized);
 	}
 
 }

@@ -2,74 +2,43 @@ package net.shadowfacts.activator.tileentity;
 
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.shadowfacts.activator.ActivatorConfig;
-import net.shadowfacts.activator.misc.RedstoneMode;
 
 /**
  * @author shadowfacts
  */
-public class TileEntityRFActivator extends TileEntityActivator implements IEnergyHandler {
+public class TileEntityRFActivator extends TileEntityRedstoneActivator implements IEnergyHandler {
 
 	private static final String MODE = "Mode";
 
-//	Non-persistent
-	protected int prevRedstone;
-	protected int redstone;
-
-//	Persistent
 	public EnergyStorage storage = new EnergyStorage(ActivatorConfig.rfCapacity);
-	public RedstoneMode redstoneMode = RedstoneMode.HIGH;
-
-	@Override
-	public void updateEntity() {
-		prevRedstone = redstone;
-		redstone = worldObj.getBlockPowerInput(xCoord, yCoord, zCoord);
-
-		super.updateEntity();
-	}
-
-	private boolean validateRedstone() {
-		switch (redstoneMode) {
-			case ALWAYS:
-				return true;
-			case NEVER:
-				return false;
-			case HIGH:
-				return redstone >= 0;
-			case LOW:
-				return redstone == 0;
-			case PULSE:
-				return redstone != prevRedstone;
-			default:
-				return false;
-		}
-	}
 
 	@Override
 	protected boolean canAttackEntity(Entity entity, ItemStack stack) {
 		return storage.getEnergyStored() >= ActivatorConfig.rfAttackEnergy &&
-				validateRedstone();
+				canActivate;
 	}
 
 	@Override
-	protected boolean canBreakBlock(int x, int y, int z, Block block, ItemStack stack) {
+	protected boolean canBreakBlock(BlockPos pos, IBlockState state, ItemStack stack) {
 		return storage.getEnergyStored() >= ActivatorConfig.rfBreakEnergy &&
-				validateRedstone();
+				canActivate;
 	}
 
 	@Override
 	protected boolean canRightClick(ItemStack stack) {
 		return storage.getEnergyStored() >= ActivatorConfig.rfRightClickEnergy &&
-				validateRedstone();
+				canActivate;
 	}
 
 	@Override
-	protected void postActivate(TileEntityActivator.Action action) {
+	protected void postActivate(Action action) {
 		switch (action) {
 			case ATTACK_ENTITY:
 				storage.extractEnergy(ActivatorConfig.rfAttackEnergy, false);
@@ -83,14 +52,10 @@ public class TileEntityRFActivator extends TileEntityActivator implements IEnerg
 		}
 	}
 
-	//	Persistence
 	@Override
 	public NBTTagCompound save(NBTTagCompound tag) {
 		tag = super.save(tag);
-
 		storage.writeToNBT(tag);
-		tag.setInteger(MODE, redstoneMode.ordinal());
-
 		return tag;
 	}
 
@@ -99,12 +64,11 @@ public class TileEntityRFActivator extends TileEntityActivator implements IEnerg
 		super.load(tag);
 
 		storage.readFromNBT(tag);
-		redstoneMode = RedstoneMode.get(tag.getInteger(MODE));
 	}
 
 //	IEnergyHandler
 	@Override
-	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
+	public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
 		if (canConnectEnergy(from)) {
 			int ret = storage.receiveEnergy(maxReceive, simulate);
 			sync();
@@ -114,7 +78,7 @@ public class TileEntityRFActivator extends TileEntityActivator implements IEnerg
 	}
 
 	@Override
-	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate) {
+	public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
 		if (canConnectEnergy(from)) {
 			int ret = storage.extractEnergy(maxExtract, simulate);
 			sync();
@@ -124,17 +88,17 @@ public class TileEntityRFActivator extends TileEntityActivator implements IEnerg
 	}
 
 	@Override
-	public int getEnergyStored(ForgeDirection from) {
+	public int getEnergyStored(EnumFacing from) {
 		return storage.getEnergyStored();
 	}
 
 	@Override
-	public int getMaxEnergyStored(ForgeDirection from) {
+	public int getMaxEnergyStored(EnumFacing from) {
 		return storage.getMaxEnergyStored();
 	}
 
 	@Override
-	public boolean canConnectEnergy(ForgeDirection from) {
+	public boolean canConnectEnergy(EnumFacing from) {
 		return from != getFacing();
 	}
 }

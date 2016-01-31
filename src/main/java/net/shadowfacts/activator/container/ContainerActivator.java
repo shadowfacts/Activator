@@ -1,21 +1,21 @@
 package net.shadowfacts.activator.container;
 
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
+import net.shadowfacts.shadowmc.inventory.ContainerBase;
 
 /**
  * @author shadowfacts
  */
-public class ContainerActivator extends Container {
+public class ContainerActivator extends ContainerBase {
 
 	private TileEntityActivator activator;
 
 	public ContainerActivator(InventoryPlayer playerInv, TileEntityActivator activator) {
+		super(activator.getPos());
 		this.activator = activator;
 
 		addSlotToContainer(new Slot(activator, 0, 80, 17));
@@ -30,18 +30,12 @@ public class ContainerActivator extends Container {
 		for (int i = 0; i < 9; ++i) {
 			addSlotToContainer(new Slot(playerInv, i, 8 + i * 18, 142));
 		}
-
-	}
-
-	@Override
-	public boolean canInteractWith(EntityPlayer player) {
-		return activator.isUseableByPlayer(player);
 	}
 
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer player, int slotNum) {
 		ItemStack itemStack = null;
-		Slot slot = (Slot)inventorySlots.get(slotNum);
+		Slot slot = inventorySlots.get(slotNum);
 
 		if (slot != null && slot.getHasStack()) {
 			ItemStack itemStack1 = slot.getStack();
@@ -71,4 +65,5 @@ public class ContainerActivator extends Container {
 
 		return itemStack;
 	}
+
 }

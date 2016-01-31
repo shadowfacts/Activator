@@ -1,8 +1,7 @@
 # Blocks
 tile.activator.name=Basic Activator
-tile.activator.redstone.name=Redstone Activator
-tile.activator.rf.name=RF Activator
-tile.activator.eu.name=EU Activator
+tile.activator-redstone.name=Redstone Activator
+tile.activator-rf.name=RF Activator
 
 # Action types
 activator.action.left=Left Click
@@ -27,3 +26,5 @@ gui.activator.redstone2=Current:
 
 # Achievements
 achievement.craftActivator=Craft a Basic Activator
+achievement.craftRedstoneActivator=Craft a Redstone Activator
+achievement.craftRFActivator=Craft a RF Activator

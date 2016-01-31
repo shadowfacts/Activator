@@ -1,10 +1,11 @@
 package net.shadowfacts.activator.tileentity;
 
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.shadowfacts.activator.misc.RedstoneMode;
+import net.minecraft.util.BlockPos;
+import net.shadowfacts.shadowmc.util.RedstoneMode;
 
 /**
  * @author shadowfacts
@@ -13,67 +14,69 @@ public class TileEntityRedstoneActivator extends TileEntityActivator {
 
 	private static final String MODE = "Mode";
 
-//	Non-persistent
-	protected int prevRedstone;
+	protected boolean canActivate;
+
 	protected int redstone;
 
-//	Persistent
 	public RedstoneMode redstoneMode = RedstoneMode.HIGH;
 
 	@Override
-	public void updateEntity() {
-		prevRedstone = redstone;
-		redstone = worldObj.getBlockPowerInput(xCoord, yCoord, zCoord);
-
-		super.updateEntity();
-	}
-
-	private boolean validateRedstone() {
+	public void update() {
+		int redstone = worldObj.getRedstonePower(pos, getFacing());
 		switch (redstoneMode) {
 			case ALWAYS:
-				return true;
+				canActivate = true;
+				break;
 			case NEVER:
-				return false;
+				canActivate = false;
+				break;
 			case HIGH:
-				return redstone >= 0;
+				canActivate = redstone != 0;
+				break;
 			case LOW:
-				return redstone == 0;
+				canActivate = redstone == 0;
+				break;
 			case PULSE:
-				return redstone != prevRedstone;
-			default:
-				return false;
+				canActivate = this.redstone != redstone;
+				break;
+
 		}
+		this.redstone = redstone;
+
+		super.update();
 	}
 
 	@Override
 	protected boolean canAttackEntity(Entity entity, ItemStack stack) {
-		return validateRedstone();
+		return canActivate;
 	}
 
 	@Override
-	protected boolean canBreakBlock(int x, int y, int z, Block block, ItemStack stack) {
-		return validateRedstone();
+	protected boolean canBreakBlock(BlockPos pos, IBlockState state, ItemStack stack) {
+		return canActivate;
 	}
 
 	@Override
 	protected boolean canRightClick(ItemStack stack) {
-		return validateRedstone();
+		return canActivate;
 	}
 
-//	Persistence
+	@Override
+	protected void postActivate(Action action) {
+		canActivate = false;
+	}
+
 	@Override
 	public NBTTagCompound save(NBTTagCompound tag) {
 		tag = super.save(tag);
-
 		tag.setInteger(MODE, redstoneMode.ordinal());
-
 		return tag;
 	}
 
 	@Override
 	public void load(NBTTagCompound tag) {
 		super.load(tag);
-		redstoneMode = RedstoneMode.get(tag.getInteger(MODE));
+		redstoneMode = RedstoneMode.values()[tag.getInteger(MODE)];
 	}
 
 }

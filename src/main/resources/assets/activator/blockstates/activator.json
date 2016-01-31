@@ -1,0 +1,28 @@
+{
+	"forge_marker": 1,
+	"defaults": {
+		"model": "activator:activator"
+	},
+	"variants": {
+		"facing": {
+			"north": {
+
+			},
+			"south": {
+				"y": 180
+			},
+			"east": {
+				"y": 90
+			},
+			"west": {
+				"y": 270
+			},
+			"up": {
+				"x": -90
+			},
+			"down": {
+				"x": 90
+			}
+		}
+	}
+}

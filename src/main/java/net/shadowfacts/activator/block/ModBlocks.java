@@ -1,8 +1,7 @@
 package net.shadowfacts.activator.block;
 
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
  * @author shadowfacts
@@ -15,17 +14,12 @@ public class ModBlocks {
 
 	public void initializeBlocks() {
 		activator = register(new BlockActivator(), "activator");
-		redstoneActivator = register(new BlockRedstoneActivator(), "activator.redstone");
-		rfActivator = register(new BlockRFActivator(), "activator.rf");
+		redstoneActivator = register(new BlockRedstoneActivator(), "activator-redstone");
+		rfActivator = register(new BlockRFActivator(), "activator-rf");
 	}
 
 	private <T extends Block> T register(T block, String name) {
 		GameRegistry.registerBlock(block, name);
-		return block;
-	}
-
-	private <T extends Block> T register(T block, String name, Class<? extends ItemBlock> itemBlockClass, Object... itemBlockCtorArgs) {
-		GameRegistry.registerBlock(block, itemBlockClass, name, itemBlockCtorArgs);
 		return block;
 	}
 
