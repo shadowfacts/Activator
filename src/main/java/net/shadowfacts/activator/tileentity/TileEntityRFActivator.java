@@ -40,7 +40,7 @@ public class TileEntityRFActivator extends TileEntityActivator implements IEnerg
 			case NEVER:
 				return false;
 			case HIGH:
-				return redstone >= 0;
+				return redstone != 0;
 			case LOW:
 				return redstone == 0;
 			case PULSE:
