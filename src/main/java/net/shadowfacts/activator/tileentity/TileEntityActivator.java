@@ -274,13 +274,15 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory, I
 	}
 
 	@Override
-	public void load(NBTTagCompound tag) {
-		NBTTagList invTagList = tag.getTagList(INVENTORY, 10);
-		for (int i = 0; i < invTagList.tagCount(); i++) {
-			NBTTagCompound itemTag = invTagList.getCompoundTagAt(i);
-			int slot = itemTag.getInteger(SLOT);
-			if (slot >= 0 && slot < getSizeInventory()) {
-				inventory[slot] = ItemStack.loadItemStackFromNBT(itemTag);
+	public void load(NBTTagCompound tag, boolean loadInventory) {
+		if (loadInventory) {
+			NBTTagList invTagList = tag.getTagList(INVENTORY, 10);
+			for (int i = 0; i < invTagList.tagCount(); i++) {
+				NBTTagCompound itemTag = invTagList.getCompoundTagAt(i);
+				int slot = itemTag.getInteger(SLOT);
+				if (slot >= 0 && slot < getSizeInventory()) {
+					inventory[slot] = ItemStack.loadItemStackFromNBT(itemTag);
+				}
 			}
 		}
 

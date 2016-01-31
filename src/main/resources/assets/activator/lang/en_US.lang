@@ -3,6 +3,9 @@ tile.activator.name=Basic Activator
 tile.activator-redstone.name=Redstone Activator
 tile.activator-rf.name=RF Activator
 
+# Item
+item.gear.name=Simple Gear
+
 # Action types
 activator.action.left=Left Click
 activator.action.left_sneak=Sneak Left Click

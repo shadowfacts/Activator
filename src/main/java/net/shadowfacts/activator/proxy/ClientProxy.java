@@ -15,9 +15,12 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void init(FMLInitializationEvent event) {
+		super.init(event);
+
 		registerInvModel(Activator.blocks.activator, 0, "activator");
 		registerInvModel(Activator.blocks.redstoneActivator, 0, "activator");
 		registerInvModel(Activator.blocks.rfActivator, 0, "activator");
+		registerInvModel(Activator.items.gear, 0, "gear");
 	}
 
 	private static void registerInvModel(Block block, int meta, String id) {

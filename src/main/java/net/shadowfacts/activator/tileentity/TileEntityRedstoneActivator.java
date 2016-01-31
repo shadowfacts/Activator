@@ -67,15 +67,15 @@ public class TileEntityRedstoneActivator extends TileEntityActivator {
 	}
 
 	@Override
-	public NBTTagCompound save(NBTTagCompound tag) {
-		tag = super.save(tag);
+	public NBTTagCompound save(NBTTagCompound tag, boolean saveInventory) {
+		tag = super.save(tag, saveInventory);
 		tag.setInteger(MODE, redstoneMode.ordinal());
 		return tag;
 	}
 
 	@Override
-	public void load(NBTTagCompound tag) {
-		super.load(tag);
+	public void load(NBTTagCompound tag, boolean loadInventory) {
+		super.load(tag, loadInventory);
 		redstoneMode = RedstoneMode.values()[tag.getInteger(MODE)];
 	}
 

@@ -53,15 +53,15 @@ public class TileEntityRFActivator extends TileEntityRedstoneActivator implement
 	}
 
 	@Override
-	public NBTTagCompound save(NBTTagCompound tag) {
-		tag = super.save(tag);
+	public NBTTagCompound save(NBTTagCompound tag, boolean saveInventory) {
+		tag = super.save(tag, saveInventory);
 		storage.writeToNBT(tag);
 		return tag;
 	}
 
 	@Override
-	public void load(NBTTagCompound tag) {
-		super.load(tag);
+	public void load(NBTTagCompound tag, boolean loadInventory) {
+		super.load(tag, loadInventory);
 
 		storage.readFromNBT(tag);
 	}
