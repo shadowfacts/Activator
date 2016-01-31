@@ -35,7 +35,7 @@ public class TileEntityRedstoneActivator extends TileEntityActivator {
 			case NEVER:
 				return false;
 			case HIGH:
-				return redstone >= 0;
+				return redstone != 0;
 			case LOW:
 				return redstone == 0;
 			case PULSE:
