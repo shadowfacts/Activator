@@ -1,7 +1,10 @@
 package net.shadowfacts.activator;
 
 import net.shadowfacts.shadowmc.config.Config;
+import net.shadowfacts.shadowmc.config.ConfigManager;
 import net.shadowfacts.shadowmc.config.ConfigProperty;
+
+import java.io.File;
 
 /**
  * @author shadowfacts
@@ -30,16 +33,10 @@ public class ActivatorConfig {
 	@ConfigProperty(name = "rightClickEnergy", category = "activator.rf", comment = "How much RF required to right-click")
 	public static int rfRightClickEnergy = 256;
 
-	@ConfigProperty(name = "enabled", category = "activator.eu", comment = "Enable the EU activator")
-	public static boolean euEnabled = true;
-
-	@ConfigProperty(name = "capacity", category = "activator.eu", comment = "How much EU the activator can store")
-	public static int euCapacity = 2048;
-
-	@ConfigProperty(name = "attackEnergy", category = "activator.eu", comment = "How much EU required to attack an entity")
-	public static int euAttackEnergy = 512;
-
-	@ConfigProperty(name = "breakEnergy", category = "activator.eu", comment = "How much EU required to break a block")
-	public static int euBreakEnergy = 512;
+	public static void init(File configDir) {
+		ConfigManager.instance.configDir = configDir;
+		ConfigManager.instance.register("Activator", ActivatorConfig.class, "Activator");
+		ConfigManager.instance.load("Activator");
+	}
 
 }

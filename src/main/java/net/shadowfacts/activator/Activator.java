@@ -10,23 +10,20 @@ import net.shadowfacts.activator.block.ModBlocks;
 import net.shadowfacts.activator.compat.CompatActuallyAdditions;
 import net.shadowfacts.activator.item.ModItems;
 import net.shadowfacts.activator.proxy.CommonProxy;
-import net.shadowfacts.shadowmc.BaseMod;
-import net.shadowfacts.shadowmc.proxy.BaseProxy;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.shadowfacts.shadowmc.util.LogHelper;
 
 /**
  * @author shadowfacts
  */
-@Mod(modid = Activator.modId, name = Activator.name, version = Activator.version, dependencies = Activator.depString)
-public class Activator extends BaseMod {
+@Mod(modid = Activator.modId, name = Activator.name, version = Activator.version)
+public class Activator {
 
 	public static final String modId = "Activator";
 	public static final String name = modId;
 	public static final String version = "1.1.0";
 	public static final String depString = "required-after:shadowmc;after:ActuallyAdditions;";
 
-	public static Logger log = LogManager.getLogger(modId);
+	public static LogHelper log = new LogHelper(modId);
 
 	@SidedProxy(serverSide = "net.shadowfacts.activator.proxy.CommonProxy", clientSide = "net.shadowfacts.activator.proxy.ClientProxy")
 	public static CommonProxy proxy;
@@ -38,50 +35,23 @@ public class Activator extends BaseMod {
 	public static ModItems items = new ModItems();
 	public static ModBlocks blocks = new ModBlocks();
 
-	@Override
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		super.preInit(event);
-//		getCompatManager().registerModule(CompatActuallyAdditions.class);
+		ActivatorConfig.init(event.getModConfigurationDirectory());
+		proxy.preInit(event);
 	}
 
-	@Override
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-		super.init(event);
+		proxy.init(event);
 		if (Loader.isModLoaded("ActuallyAdditions")) {
-			new CompatActuallyAdditions().init(event);	
+			new CompatActuallyAdditions().init(event);
 		}
 	}
 
-	@Override
 	@Mod.EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		super.postInit(event);
+		proxy.postInit(event);
 	}
 
-	@Override
-	public String getModId() {
-		return modId;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String getVersionString() {
-		return version;
-	}
-
-	@Override
-	public Class<?> getConfigClass() {
-		return ActivatorConfig.class;
-	}
-
-	@Override
-	public BaseProxy getProxy() {
-		return proxy;
-	}
 }
