@@ -29,6 +29,7 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.block.BlockActivator;
 import net.shadowfacts.activator.misc.ActivatorAction;
+import net.shadowfacts.shadowmc.nbt.AutoSerializeNBT;
 import net.shadowfacts.shadowmc.tileentity.BaseTileEntity;
 
 import java.util.ArrayList;
@@ -52,9 +53,12 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory, I
 
 //	Persistent
 	private ItemStack[] inventory = new ItemStack[1];
+	@AutoSerializeNBT
 	public int activationFrequency = 20;
 	@Getter
+	@AutoSerializeNBT
 	private ActivatorAction action = ActivatorAction.RIGHT_CLICK;
+	@AutoSerializeNBT
 	public boolean sneaking = false;
 
 //	Non-persistent
@@ -256,20 +260,19 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory, I
 //	Persistence
 	@Override
 	public NBTTagCompound save(NBTTagCompound tag, boolean saveInventory) {
-		NBTTagList invTagList = new NBTTagList();
-		for (int i = 0; i < inventory.length; i++) {
-			if (inventory[i] != null) {
-				NBTTagCompound itemTag = new NBTTagCompound();
-				itemTag.setInteger(SLOT, i);
-				inventory[i].writeToNBT(itemTag);
-				invTagList.appendTag(itemTag);
+		if (saveInventory) {
+			NBTTagList invTagList = new NBTTagList();
+			for (int i = 0; i < inventory.length; i++) {
+				if (inventory[i] != null) {
+					NBTTagCompound itemTag = new NBTTagCompound();
+					itemTag.setInteger(SLOT, i);
+					inventory[i].writeToNBT(itemTag);
+					invTagList.appendTag(itemTag);
+				}
 			}
-		}
 
-		tag.setTag(INVENTORY, invTagList);
-		tag.setInteger(ACTIVATE_FREQUENCY, activationFrequency);
-		tag.setInteger(ACTION, action.ordinal());
-		tag.setBoolean(SNEAKING, sneaking);
+			tag.setTag(INVENTORY, invTagList);
+		}
 		return tag;
 	}
 
@@ -285,10 +288,6 @@ public class TileEntityActivator extends BaseTileEntity implements IInventory, I
 				}
 			}
 		}
-
-		activationFrequency = tag.getInteger(ACTIVATE_FREQUENCY);
-		action = ActivatorAction.values()[tag.getInteger(ACTION)];
-		sneaking = tag.getBoolean(SNEAKING);
 	}
 
 //	Utilities

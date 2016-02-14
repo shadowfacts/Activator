@@ -14,9 +14,11 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.shadowfacts.activator.Activator;
 import net.shadowfacts.activator.ActivatorConfig;
 import net.shadowfacts.activator.gui.GUIHandler;
+import net.shadowfacts.activator.misc.ActivatorAction;
 import net.shadowfacts.activator.tileentity.TileEntityActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRFActivator;
 import net.shadowfacts.activator.tileentity.TileEntityRedstoneActivator;
+import net.shadowfacts.shadowmc.nbt.AutoNBTSerializer;
 import net.shadowfacts.shadowmc.proxy.BaseProxy;
 
 /**
@@ -34,6 +36,7 @@ public class CommonProxy extends BaseProxy {
 		NetworkRegistry.INSTANCE.registerGuiHandler(Activator.instance, new GUIHandler());
 
 		registerOreDict();
+		AutoNBTSerializer.registerSerializer(ActivatorAction.class, (tag, name, val) -> tag.setInteger(name, val.ordinal()), (tag, name) -> ActivatorAction.values()[tag.getInteger(name)]);
 	}
 
 	@Override

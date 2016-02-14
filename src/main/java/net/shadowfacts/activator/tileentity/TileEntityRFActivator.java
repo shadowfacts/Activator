@@ -9,6 +9,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.shadowfacts.activator.ActivatorConfig;
+import net.shadowfacts.shadowmc.nbt.AutoSerializeNBT;
 
 /**
  * @author shadowfacts

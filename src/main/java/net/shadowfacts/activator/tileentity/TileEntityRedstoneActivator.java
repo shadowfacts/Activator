@@ -3,8 +3,8 @@ package net.shadowfacts.activator.tileentity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
+import net.shadowfacts.shadowmc.nbt.AutoSerializeNBT;
 import net.shadowfacts.shadowmc.util.RedstoneMode;
 
 /**
@@ -18,6 +18,7 @@ public class TileEntityRedstoneActivator extends TileEntityActivator {
 
 	protected int redstone;
 
+	@AutoSerializeNBT
 	public RedstoneMode redstoneMode = RedstoneMode.HIGH;
 
 	@Override
@@ -64,19 +65,6 @@ public class TileEntityRedstoneActivator extends TileEntityActivator {
 	@Override
 	protected void postActivate(Action action) {
 		canActivate = false;
-	}
-
-	@Override
-	public NBTTagCompound save(NBTTagCompound tag, boolean saveInventory) {
-		tag = super.save(tag, saveInventory);
-		tag.setInteger(MODE, redstoneMode.ordinal());
-		return tag;
-	}
-
-	@Override
-	public void load(NBTTagCompound tag, boolean loadInventory) {
-		super.load(tag, loadInventory);
-		redstoneMode = RedstoneMode.values()[tag.getInteger(MODE)];
 	}
 
 }
