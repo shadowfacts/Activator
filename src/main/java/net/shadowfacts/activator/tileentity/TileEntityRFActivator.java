@@ -2,6 +2,7 @@ package net.shadowfacts.activator.tileentity;
 
 import cofh.api.energy.EnergyStorage;
 import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -9,12 +10,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.shadowfacts.activator.ActivatorConfig;
-import net.shadowfacts.shadowmc.nbt.AutoSerializeNBT;
 
 /**
  * @author shadowfacts
  */
-public class TileEntityRFActivator extends TileEntityRedstoneActivator implements IEnergyHandler {
+public class TileEntityRFActivator extends TileEntityRedstoneActivator implements IEnergyReceiver {
 
 	private static final String MODE = "Mode";
 
@@ -67,21 +67,11 @@ public class TileEntityRFActivator extends TileEntityRedstoneActivator implement
 		storage.readFromNBT(tag);
 	}
 
-//	IEnergyHandler
+//	IEnergyReceiver
 	@Override
 	public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
 		if (canConnectEnergy(from)) {
 			int ret = storage.receiveEnergy(maxReceive, simulate);
-			sync();
-			return ret;
-		}
-		return 0;
-	}
-
-	@Override
-	public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-		if (canConnectEnergy(from)) {
-			int ret = storage.extractEnergy(maxExtract, simulate);
 			sync();
 			return ret;
 		}
@@ -102,4 +92,5 @@ public class TileEntityRFActivator extends TileEntityRedstoneActivator implement
 	public boolean canConnectEnergy(EnumFacing from) {
 		return from != getFacing();
 	}
+	
 }
